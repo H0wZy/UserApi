@@ -1,0 +1,13 @@
+@user_api.cs_HostAddress = http://localhost:5173
+
+#if (EnableOpenAPI)
+GET {{user_api.cs_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
+#endif
+
+GET {{user_api.cs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
