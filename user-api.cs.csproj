@@ -6,7 +6,16 @@
     <RootNamespace>user_api.cs</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0-preview.2.26159.112"/>
-    <PackageReference Include="Scalar.AspNetCore" Version="2.13.14"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0-preview.2.26159.112" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0-preview.3.26207.106" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-preview.3.26207.106" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="11.0.0-preview.3.26207.106" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-preview.3" />
+    <PackageReference Include="AutoMapper" Version="v16.1.1" />
+    <PackageReference Include="Microsoft.AspNet.Authentication.JwtBearer" Version="1.0.0-rc1-final" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
+    <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 </Project>
