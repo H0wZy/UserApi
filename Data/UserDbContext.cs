@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using user_api.cs.Models;
 
-namespace user_api.cs;
+namespace user_api.cs.Data;
 
 public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 {
@@ -13,16 +13,14 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 
         foreach (var entry in entries)
         {
-            if (entry.State == EntityState.Modified)
+            entry.Entity.UpdatedAt = entry.State switch
             {
-                entry.Entity.UpdatedAt = DateTime.UtcNow;
-            }
+                EntityState.Added or EntityState.Modified => DateTime.UtcNow,
+                _ => entry.Entity.UpdatedAt
+            };
 
             if (entry.State == EntityState.Added)
-            {
                 entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.UpdatedAt = DateTime.UtcNow;
-            }
         }
 
         return await base.SaveChangesAsync(cancellationToken);

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using user_api.cs.Data;
 using user_api.cs.Models;
 
 namespace user_api.cs.Repositories;
