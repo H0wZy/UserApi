@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using user_api.cs;
+using user_api.cs.Data;
 using user_api.cs.Models;
 using user_api.cs.Repositories;
 using user_api.cs.Services;
@@ -17,6 +18,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // TODO: AutoMapper
 // builder.Services.AddAutoMapper(_)...
+
+builder.Services.AddDbContext<UserDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 var logger = app.Logger;
