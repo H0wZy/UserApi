@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using user_api.cs.Models;
 
-namespace user_api.cs;
+namespace user_api.cs.Repositories;
 
-public class GenericRepository<T>(UserDbContext context) : IGenericRepository<T> where T : BaseEntity
+public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> where T : BaseEntity
 {
-    protected readonly UserDbContext _ctx = context;
-    protected readonly DbSet<T> _dbSet = context.Set<T>();
+    private readonly DbSet<T> _dbSet = ctx.Set<T>();
 
     public async Task<T> CreateAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
-        await _ctx.SaveChangesAsync();
+        await ctx.SaveChangesAsync();
         return entity;
     }
 
@@ -27,7 +27,7 @@ public class GenericRepository<T>(UserDbContext context) : IGenericRepository<T>
     public async Task<T> UpdateAsync(T entity)
     {
         _dbSet.Update(entity);
-        await _ctx.SaveChangesAsync();
+        await ctx.SaveChangesAsync();
         return entity;
     }
 }
