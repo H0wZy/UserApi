@@ -1,4 +1,4 @@
-namespace user_api.cs;
+namespace user_api.cs.Repositories;
 
 public interface IGenericRepository<T> where T : class
 {
