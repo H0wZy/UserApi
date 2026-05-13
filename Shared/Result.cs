@@ -6,7 +6,7 @@ public class Result<T>
     public string? Error { get; }
     public T? Value { get; }
 
-    protected Result(bool success, string? error, T? value)
+    private Result(bool success, string? error, T? value)
     {
         Success = success;
         Error = error;

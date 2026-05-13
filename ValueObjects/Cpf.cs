@@ -5,18 +5,15 @@ namespace user_api.cs.ValueObjects;
 
 public sealed partial record Cpf
 {
-    public string Value { get; init; } = string.Empty;
+    public string Value { get; } = string.Empty;
 
     public static Result<Cpf> Create(string value)
     {
         value = RemoveFormatting(value);
-        if (!IsValid(value)) return Result<Cpf>.Fail("Cpf inválido!");
-        return Result<Cpf>.Ok(new Cpf(value, true));
+        return !IsValid(value) ? Result<Cpf>.Fail("Cpf inválido!") : Result<Cpf>.Ok(new Cpf(value));
     }
 
-    private Cpf() { }
-
-    private Cpf(string value, bool _)
+    private Cpf(string value)
     {
         Value = value;
     }
@@ -25,7 +22,7 @@ public sealed partial record Cpf
     private static partial Regex NonDigitsRegex();
     private static string RemoveFormatting(string value) => NonDigitsRegex().Replace(value, "");
 
-    public static bool IsValid(string cpf)
+    private static bool IsValid(string cpf)
     {
         if (string.IsNullOrWhiteSpace(cpf)) return false;
 

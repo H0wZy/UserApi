@@ -10,10 +10,6 @@ public class CpfResolver : IValueResolver<CreateUserDto, User, Cpf>
     public Cpf Resolve(CreateUserDto source, User destination, Cpf destMember, ResolutionContext context)
     {
         var result = Cpf.Create(source.Cpf);
-
-        if (!result.Success)
-            throw new AutoMapperMappingException(result.Error);
-
-        return result.Value!;
+        return !result.Success ? throw new AutoMapperMappingException(result.Error) : result.Value!;
     }
 }

@@ -16,7 +16,7 @@ namespace user_api.cs.Migrations
         // If you encounter a merge conflict in the line below, it means you need to
         // discard one of the migration branches and recreate its migrations on top of
         // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-        public override string LatestMigrationId => "20260513164329_MigrationCpf";
+        public override string LatestMigrationId => "20260513220223_NewMigration";
 
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

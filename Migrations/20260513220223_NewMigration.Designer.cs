@@ -12,8 +12,8 @@ using user_api.cs.Data;
 namespace user_api.cs.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260513164329_MigrationCpf")]
-    partial class _20260513164329_MigrationCpf
+    [Migration("20260513220223_NewMigration")]
+    partial class _20260513220223_NewMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
