@@ -25,4 +25,20 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 
         return await base.SaveChangesAsync(cancellationToken);
     }
+
+    protected override void OnModelCreating(ModelBuilder mb)
+    {
+        mb.Entity<User>(entity =>
+        {
+            entity.OwnsOne(u => u.Cpf, cpf =>
+            {
+                cpf.Property(c => c.Value)
+                .HasColumnName("cpf")
+                .HasMaxLength(11)
+                .IsRequired();
+            });
+        });
+
+        base.OnModelCreating(mb);
+    }
 }

@@ -1,4 +1,5 @@
-﻿using user_api.cs.Shared;
+﻿using AutoMapper;
+using user_api.cs.Shared;
 
 namespace user_api.cs.Middleware;
 
@@ -10,12 +11,12 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         {
             await next(ctx);
         }
-        catch (Exception ex)
+        catch (AutoMapperMappingException ex)
         {
             logger.LogError(ex, "Erro não tratado: {Message}", ex.Message);
-            ctx.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            ctx.Response.StatusCode = StatusCodes.Status400BadRequest;
             ctx.Response.ContentType = "application/json";
-            await ctx.Response.WriteAsJsonAsync(GenericResponse<bool>.InternalServerError("Ocorreu um erro inesperado."));
+            await ctx.Response.WriteAsJsonAsync(GenericResponse<bool>.BadRequest(ex.Message));
         }
     }
 }

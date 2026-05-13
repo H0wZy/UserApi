@@ -12,8 +12,8 @@ using user_api.cs.Data;
 namespace user_api.cs.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260513032520_InitialCreate")]
-    partial class _20260513032520_InitialCreate
+    [Migration("20260513164329_MigrationCpf")]
+    partial class _20260513164329_MigrationCpf
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,9 +36,9 @@ namespace user_api.cs.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("accepted_terms");
 
-                    b.Property<DateTime?>("AcceptedTermsDate")
+                    b.Property<DateTime?>("AcceptedTermsAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("accepted_terms_date");
+                        .HasColumnName("accepted_terms_at");
 
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date")
@@ -92,6 +92,10 @@ namespace user_api.cs.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
+                    b.Property<int>("UserType")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_type");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -101,6 +105,31 @@ namespace user_api.cs.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("user");
+                });
+
+            modelBuilder.Entity("user_api.cs.Models.User", b =>
+                {
+                    b.OwnsOne("user_api.cs.ValueObjects.Cpf", "Cpf", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(11)
+                                .HasColumnType("character varying(11)")
+                                .HasColumnName("cpf");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("user");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("Cpf")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

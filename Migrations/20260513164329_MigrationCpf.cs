@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace user_api.cs.Migrations
 {
     /// <inheritdoc />
-    public partial class _20260513032520_InitialCreate : Migration
+    public partial class _20260513164329_MigrationCpf : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,11 +20,13 @@ namespace user_api.cs.Migrations
                     email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     first_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     last_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    user_type = table.Column<int>(type: "integer", nullable: false),
+                    cpf = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
                     hash_password = table.Column<byte[]>(type: "bytea", nullable: false),
                     salt_password = table.Column<byte[]>(type: "bytea", nullable: false),
                     birth_date = table.Column<DateOnly>(type: "date", nullable: false),
                     accepted_terms = table.Column<bool>(type: "boolean", nullable: false),
-                    accepted_terms_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    accepted_terms_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     is_disabled = table.Column<bool>(type: "boolean", nullable: false),

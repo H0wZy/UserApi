@@ -8,6 +8,7 @@ public record CreateUserDto(
     [Required, MinLength(3), MaxLength(255)] string FirstName,
     [Required, MinLength(3), MaxLength(255)] string LastName,
     [Required, MinLength(8)] string Password,
+    [Required, RegularExpression(@"^\d{11}$")] string Cpf,
     [Required] DateOnly BirthDate,
     [Required] bool AcceptTerms
 );
