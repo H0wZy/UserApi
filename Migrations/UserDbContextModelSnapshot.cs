@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using user_api.cs;
 using user_api.cs.Data;
 
 #nullable disable
@@ -17,7 +16,7 @@ namespace user_api.cs.Migrations
         // If you encounter a merge conflict in the line below, it means you need to
         // discard one of the migration branches and recreate its migrations on top of
         // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-        public override string LatestMigrationId => "20260512230201_Initial";
+        public override string LatestMigrationId => "20260513032520_InitialCreate";
 
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -43,6 +42,10 @@ namespace user_api.cs.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("accepted_terms_date");
 
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date")
+                        .HasColumnName("birth_date");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -64,9 +67,17 @@ namespace user_api.cs.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("hash_password");
 
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_disabled");
+
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_login_at");
+
+                    b.Property<DateTime?>("LastLogoutAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_logout_at");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -82,10 +93,6 @@ namespace user_api.cs.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
-
-                    b.Property<bool>("UserDisabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("user_disabled");
 
                     b.Property<string>("Username")
                         .IsRequired()

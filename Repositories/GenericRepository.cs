@@ -6,12 +6,13 @@ namespace user_api.cs.Repositories;
 
 public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> where T : BaseEntity
 {
+    protected readonly UserDbContext Context = ctx;
     private readonly DbSet<T> _dbSet = ctx.Set<T>();
 
     public async Task<T> CreateAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
-        await ctx.SaveChangesAsync();
+        await Context.SaveChangesAsync();
         return entity;
     }
 
@@ -28,7 +29,7 @@ public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> whe
     public async Task<T> UpdateAsync(T entity)
     {
         _dbSet.Update(entity);
-        await ctx.SaveChangesAsync();
+        await Context.SaveChangesAsync();
         return entity;
     }
 }
