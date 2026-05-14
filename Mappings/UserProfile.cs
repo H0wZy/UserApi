@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using user_api.cs.Dto;
-using user_api.cs.Mappings.Resolvers;
 using user_api.cs.Models;
 using user_api.cs.Utils;
 
@@ -12,10 +11,11 @@ public class UserProfile : Profile
     {
         // CreateUserDto → User
         CreateMap<CreateUserDto, User>()
-            // Ignorados, pois o sistema controla, não o cliente
+            // sistema controla — setados no service ou pelo EF
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.Cpf, opt => opt.Ignore())
             .ForMember(dest => dest.HashPassword, opt => opt.Ignore())
             .ForMember(dest => dest.SaltPassword, opt => opt.Ignore())
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.IsDisabled, opt => opt.Ignore())
@@ -24,9 +24,9 @@ public class UserProfile : Profile
             .ForMember(dest => dest.AcceptedTerms, opt => opt.Ignore())
             .ForMember(dest => dest.AcceptedTermsAt, opt => opt.Ignore())
 
-            // Mapeados
-            .ForMember(dest => dest.Cpf, opt => opt.MapFrom<CpfResolver>())
-            .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => src.UserType));
+            // existem no DTO, mas não têm campo correspondente no User
+            .ForSourceMember(src => src.Password, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.AcceptTerms, opt => opt.DoNotValidate());
 
         // UpdateUserDto → User (só atualiza campos não-nulos)
         CreateMap<UpdateUserDto, User>()
