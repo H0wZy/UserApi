@@ -20,6 +20,9 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (!cpfResult.Success)
             return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
 
+        if (await repository.GetCpfExistenceAsync(dto.Cpf))
+            return GenericResponse<UserDto>.Conflict("Cpf já cadastrado.");
+
         if (await repository.GetEmailExistenceAsync(dto.Email))
             return GenericResponse<UserDto>.Conflict("Email já cadastrado.");
             
@@ -27,6 +30,7 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
         var user = _mapper.Map<User>(dto);
+        user.Cpf = cpfResult.Value!;
 
         user.AcceptedTerms = true;
         user.AcceptedTermsAt = DateTime.UtcNow;
