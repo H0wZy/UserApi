@@ -5,7 +5,7 @@ using user_api.cs.ValueObjects;
 
 namespace user_api.cs.Models;
 
-[Table("user")]
+[Table("users")]
 public class User : AccountEntity
 {
     [Column("username"), MaxLength(255)] public string Username { get; set; } = string.Empty;

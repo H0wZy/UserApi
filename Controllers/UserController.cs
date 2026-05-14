@@ -1,94 +1,77 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using user_api.cs.Dto;
+using user_api.cs.Enum;
 using user_api.cs.Services;
 using user_api.cs.Shared;
+using user_api.cs.Utils;
 
 namespace user_api.cs.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/users")]
 public class UserController(IUserService service) : ControllerBase
 {
-    [HttpGet("GetAllUsers")]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<GenericResponse<IEnumerable<UserDto>>>> GetAllUsers()
-    {
-        var response = await service.GetAllAsync();
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<IEnumerable<UserDto>>>> GetAllUsers() => await ExecuteAsync(service.GetAllAsync);
 
-    [HttpGet("GetUserById/{id:guid}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserById(Guid id)
-    {
-        var response = await service.GetByIdAsync(id);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserById(Guid id) => await ExecuteAsync(() => service.GetByIdAsync(id));
 
-    [HttpGet("GetUserByEmail/{email}")]
+    [HttpGet("by-email/{email}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByEmail(string email)
-    {
-        var response = await service.GetUserByEmailAsync(email);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByEmail(string email) => await ExecuteAsync(() => service.GetUserByEmailAsync(email));
 
-    [HttpGet("GetUserByUsername/{username}")]
+    [HttpGet("by-username/{username}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByUsername(string username)
-    {
-        var response = await service.GetUserByUsernameAsync(username);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByUsername(string username) => await ExecuteAsync(() => service.GetUserByUsernameAsync(username));
 
-    [HttpPost("CreateUser")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> CreateUser([FromBody] CreateUserDto dto)
-    {
-        var response = await service.CreateAsync(dto);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<UserDto>>> CreateUser([FromBody] CreateUserDto dto) => await ExecuteAsync(() => service.CreateAsync(dto));
 
-    [HttpPut("UpdateUserById/{id:guid}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> UpdateUserById(Guid id, [FromBody] UpdateUserDto dto)
-    {
-        var response = await service.UpdateByIdAsync(id, dto);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<UserDto>>> UpdateUserById(Guid id, [FromBody] UpdateUserDto dto) => await ExecuteAsync(() => service.UpdateByIdAsync(id, dto));
 
-    [HttpPatch("UpdatePassword/{id:guid}")]
+    [HttpPatch("{id:guid}/change-password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<bool>>> UpdatePassword(Guid id, [FromBody] UpdatePasswordDto dto)
-    {
-        var response = await service.UpdateUserPasswordAsync(id, dto);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<bool>>> UpdatePassword(Guid id, [FromBody] UpdatePasswordDto dto) => await ExecuteAsync(() => service.UpdateUserPasswordAsync(id, dto));
 
-    [HttpPatch("UpdateLastLogin/{id:guid}")]
+    [HttpPatch("{id:guid}/last-login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogin(Guid id)
-    {
-        var response = await service.UpdateUserLastLoginAsync(id);
-        return StatusCode((int)response.StatusCode, response);
-    }
+    public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogin(Guid id) => await ExecuteAsync(() => service.UpdateUserLastLoginAsync(id));
 
-    [HttpDelete("DeleteUser/{id:guid}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<bool>>> DeleteUser(Guid id)
+    public async Task<ActionResult<GenericResponse<bool>>> DeleteUserById(Guid id) =>
+        await ExecuteAsync(() => service.DeleteByIdAsync(id));
+
+    [HttpGet("types")]
+    public IActionResult GetUserTypes()
     {
-        var response = await service.DeleteByIdAsync(id);
+        var types = System.Enum.GetValues<UserType>()
+            .Select(t => new UserTypeOptionDto(
+                Value: (int)t,
+                Label: t.ToDescription()));
+        return Ok(types);
+    }
+
+    private async Task<ActionResult> ExecuteAsync<T>(Func<Task<GenericResponse<T>>> action)
+    {
+        var response = await action();
         return StatusCode((int)response.StatusCode, response);
     }
 }

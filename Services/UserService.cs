@@ -14,6 +14,8 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
 
     public override async Task<GenericResponse<UserDto>> CreateAsync(CreateUserDto dto)
     {
+        if (!dto.AcceptTerms) return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
+
         var cpfResult = Cpf.Create(dto.Cpf);
         if (!cpfResult.Success)
             return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
@@ -24,7 +26,17 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (await repository.GetUsernameExistenceAsync(dto.Username))
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
-        return await base.CreateAsync(dto);
+        var user = _mapper.Map<User>(dto);
+
+        user.AcceptedTerms = true;
+        user.AcceptedTermsAt = DateTime.UtcNow;
+
+        var (hash, salt) = PasswordHelper.HashPassword(dto.Password);
+        user.HashPassword = hash;
+        user.SaltPassword = salt;
+
+        var created = await repository.CreateAsync(user);
+        return GenericResponse<UserDto>.Created(_mapper.Map<UserDto>(created));
     }
 
     public async Task<GenericResponse<UserDto>> GetUserByEmailAsync(string email)

@@ -18,8 +18,12 @@ public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> whe
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var rows = await _dbSet.Where(u => u.Id == id).ExecuteDeleteAsync();
-        return rows > 0;
+        var entity = await _dbSet.FindAsync(id);
+        if (entity is null) return false;
+
+        _dbSet.Remove(entity);
+        await Context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.AsNoTracking().ToListAsync();
@@ -28,7 +32,7 @@ public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> whe
 
     public async Task<T> UpdateAsync(T entity)
     {
-        _dbSet.Update(entity);
+        Context.Entry(entity).State = EntityState.Modified;
         await Context.SaveChangesAsync();
         return entity;
     }

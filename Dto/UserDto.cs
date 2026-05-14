@@ -7,6 +7,7 @@ public record UserDto(
     string FullName,
     DateOnly BirthDate,
     string Cpf,
+    string UserType,
     bool IsDisabled,
     bool AcceptedTerms,
     DateTime? AcceptedTermsAt,

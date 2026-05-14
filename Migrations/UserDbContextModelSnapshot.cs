@@ -16,7 +16,7 @@ namespace user_api.cs.Migrations
         // If you encounter a merge conflict in the line below, it means you need to
         // discard one of the migration branches and recreate its migrations on top of
         // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-        public override string LatestMigrationId => "20260513220223_NewMigration";
+        public override string LatestMigrationId => "20260514010813_InitialCreate";
 
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -94,8 +94,10 @@ namespace user_api.cs.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UserType")
-                        .HasColumnType("integer")
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
                         .HasColumnName("user_type");
 
                     b.Property<string>("Username")
@@ -106,7 +108,7 @@ namespace user_api.cs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("user");
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("user_api.cs.Models.User", b =>
@@ -124,7 +126,7 @@ namespace user_api.cs.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("user");
+                            b1.ToTable("users");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");

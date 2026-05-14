@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace user_api.cs.Migrations
 {
     /// <inheritdoc />
-    public partial class _20260513220223_NewMigration : Migration
+    public partial class _20260514010813_InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "user",
+                name: "users",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -20,7 +20,7 @@ namespace user_api.cs.Migrations
                     email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     first_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     last_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    user_type = table.Column<int>(type: "integer", nullable: false),
+                    user_type = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
                     cpf = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
                     hash_password = table.Column<byte[]>(type: "bytea", nullable: false),
                     salt_password = table.Column<byte[]>(type: "bytea", nullable: false),
@@ -35,7 +35,7 @@ namespace user_api.cs.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user", x => x.id);
+                    table.PrimaryKey("PK_users", x => x.id);
                 });
         }
 
@@ -43,7 +43,7 @@ namespace user_api.cs.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "user");
+                name: "users");
         }
     }
 }

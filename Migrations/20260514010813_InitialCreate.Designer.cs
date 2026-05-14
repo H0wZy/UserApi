@@ -12,8 +12,8 @@ using user_api.cs.Data;
 namespace user_api.cs.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260513220223_NewMigration")]
-    partial class _20260513220223_NewMigration
+    [Migration("20260514010813_InitialCreate")]
+    partial class _20260514010813_InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -92,8 +92,10 @@ namespace user_api.cs.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UserType")
-                        .HasColumnType("integer")
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
                         .HasColumnName("user_type");
 
                     b.Property<string>("Username")
@@ -104,7 +106,7 @@ namespace user_api.cs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("user");
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("user_api.cs.Models.User", b =>
@@ -122,7 +124,7 @@ namespace user_api.cs.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("user");
+                            b1.ToTable("users");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
