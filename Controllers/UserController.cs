@@ -30,6 +30,12 @@ public class UserController(IUserService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByUsername(string username) => await ExecuteAsync(() => service.GetUserByUsernameAsync(username));
 
+    [HttpGet("by-cpf/{cpf}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByCpf(string cpf) => await ExecuteAsync(() => service.GetUserByCpfAsync(cpf));
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

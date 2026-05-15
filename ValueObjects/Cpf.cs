@@ -5,7 +5,7 @@ namespace user_api.cs.ValueObjects;
 
 public sealed partial record Cpf
 {
-    public string Value { get; } = string.Empty;
+    public string Value { get; }
 
     public static Result<Cpf> Create(string value)
     {
@@ -13,10 +13,7 @@ public sealed partial record Cpf
         return !IsValid(value) ? Result<Cpf>.Fail("Cpf inválido!") : Result<Cpf>.Ok(new Cpf(value));
     }
 
-    private Cpf(string value)
-    {
-        Value = value;
-    }
+    private Cpf(string value) => Value = value;
 
     [GeneratedRegex(@"[^\d]")]
     private static partial Regex NonDigitsRegex();
@@ -48,13 +45,7 @@ public sealed partial record Cpf
         return numbers[10] == secondDigit;
     }
 
-    public override string ToString()
-    {
-        return ConvertToFormatted(Value);
-    }
+    public override string ToString() => ConvertToFormatted(Value);
 
-    private static string ConvertToFormatted(string cpf)
-    {
-        return Convert.ToUInt64(cpf).ToString(@"000\.000\.000\-00");
-    }
+    private static string ConvertToFormatted(string cpf) => Convert.ToUInt64(cpf).ToString(@"000\.000\.000\-00");
 }

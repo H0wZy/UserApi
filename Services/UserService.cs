@@ -30,7 +30,7 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
         var user = _mapper.Map<User>(dto);
-        user.Cpf = cpfResult.Value!;
+        user.Cpf = cpfResult.Data!;
 
         user.AcceptedTerms = true;
         user.AcceptedTermsAt = DateTime.UtcNow;
@@ -46,13 +46,24 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
     public async Task<GenericResponse<UserDto>> GetUserByEmailAsync(string email)
     {
         var user = await repository.GetByEmailAsync(email);
-        return user is null ? GenericResponse<UserDto>.NotFound() : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user));
+        return user is null ? GenericResponse<UserDto>.NotFound() : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por email realizada com sucesso!");
     }
 
     public async Task<GenericResponse<UserDto>> GetUserByUsernameAsync(string username)
     {
         var user = await repository.GetByUsernameAsync(username);
-        return user is null ? GenericResponse<UserDto>.NotFound() : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user));
+        return user is null ? GenericResponse<UserDto>.NotFound() : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por username realizada com sucesso!");
+    }
+
+    public async Task<GenericResponse<UserDto>> GetUserByCpfAsync(string cpf)
+    {
+        var cpfResult = Cpf.Create(cpf);
+        if (!cpfResult.Success) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
+
+        var user = await repository.GetByCpfAsync(cpfResult.Data!.Value);
+        return user is null
+            ? GenericResponse<UserDto>.NotFound()
+            : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por cpf realizada com sucesso!");
     }
 
     public async Task<GenericResponse<bool>> UpdateUserPasswordAsync(Guid id, UpdatePasswordDto dto)
