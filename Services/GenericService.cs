@@ -8,7 +8,7 @@ namespace user_api.cs.Services;
 public abstract class GenericService<TEntity, TDto, TCreateDto, TUpdateDto>(
      IGenericRepository<TEntity> repository,
      IMapper mapper) : IGenericService<TDto, TCreateDto, TUpdateDto>
-     where TEntity : BaseEntity
+     where TEntity : AccountEntity
      where TDto : class
      where TCreateDto : class
      where TUpdateDto : class
@@ -44,6 +44,20 @@ public abstract class GenericService<TEntity, TDto, TCreateDto, TUpdateDto>(
      public virtual async Task<GenericResponse<bool>> DeleteByIdAsync(Guid id)
      {
           var deleted = await repository.DeleteAsync(id);
-          return deleted ? GenericResponse<bool>.Ok(true, "Recurso excluído com sucesso.") : GenericResponse<bool>.NotFound();
+          return deleted
+               ? GenericResponse<bool>.Ok(true, "Recurso excluído com sucesso.")
+               : GenericResponse<bool>.NotFound();
+     }
+
+     public virtual async Task<GenericResponse<bool>> DisableByIdAsync(Guid id)
+     {
+          var entity = await repository.GetByIdAsync(id);
+          if (entity is null) return GenericResponse<bool>.NotFound();
+
+          entity.IsDisabled = true;
+          entity.DisabledAt = DateTime.UtcNow;
+
+          await repository.UpdateAsync(entity);
+          return GenericResponse<bool>.Ok(true, "Recurso desativado com sucesso.");
      }
 }

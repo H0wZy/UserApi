@@ -11,59 +11,74 @@ namespace user_api.cs.Controllers;
 [Route("api/v1/users")]
 public class UserController(IUserService service) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("get-all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<GenericResponse<IEnumerable<UserDto>>>> GetAllUsers() => await ExecuteAsync(service.GetAllAsync);
+    public async Task<ActionResult<GenericResponse<IEnumerable<UserDto>>>> GetAllUsers() =>
+        await ExecuteAsync(service.GetAllAsync);
 
-    [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserById(Guid id) => await ExecuteAsync(() => service.GetByIdAsync(id));
-
-    [HttpGet("by-email/{email}")]
+    [HttpGet("id/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByEmail(string email) => await ExecuteAsync(() => service.GetUserByEmailAsync(email));
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserById(Guid id) =>
+        await ExecuteAsync(() => service.GetByIdAsync(id));
 
-    [HttpGet("by-username/{username}")]
+    [HttpGet("email/{email}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByUsername(string username) => await ExecuteAsync(() => service.GetUserByUsernameAsync(username));
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByEmail(string email) =>
+        await ExecuteAsync(() => service.GetUserByEmailAsync(email));
 
-    [HttpGet("by-cpf/{cpf}")]
+    [HttpGet("username/{username}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByUsername(string username) =>
+        await ExecuteAsync(() => service.GetUserByUsernameAsync(username));
+
+    [HttpGet("cpf/{cpf}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByCpf(string cpf) => await ExecuteAsync(() => service.GetUserByCpfAsync(cpf));
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetUserByCpf(string cpf) =>
+        await ExecuteAsync(() => service.GetUserByCpfAsync(cpf));
 
-    [HttpPost]
+    [HttpPost("create")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> CreateUser([FromBody] CreateUserDto dto) => await ExecuteAsync(() => service.CreateAsync(dto));
+    public async Task<ActionResult<GenericResponse<UserDto>>> CreateUser([FromBody] CreateUserDto dto) =>
+        await ExecuteAsync(() => service.CreateAsync(dto));
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:guid}/update")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<UserDto>>> UpdateUserById(Guid id, [FromBody] UpdateUserDto dto) => await ExecuteAsync(() => service.UpdateByIdAsync(id, dto));
+    public async Task<ActionResult<GenericResponse<UserDto>>> UpdateUserById(Guid id, [FromBody] UpdateUserDto dto) =>
+        await ExecuteAsync(() => service.UpdateByIdAsync(id, dto));
 
     [HttpPatch("{id:guid}/change-password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<bool>>> UpdatePassword(Guid id, [FromBody] UpdatePasswordDto dto) => await ExecuteAsync(() => service.UpdateUserPasswordAsync(id, dto));
+    public async Task<ActionResult<GenericResponse<bool>>> UpdatePassword(Guid id, [FromBody] UpdatePasswordDto dto) =>
+        await ExecuteAsync(() => service.UpdateUserPasswordAsync(id, dto));
 
     [HttpPatch("{id:guid}/last-login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogin(Guid id) => await ExecuteAsync(() => service.UpdateUserLastLoginAsync(id));
+    public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogin(Guid id) =>
+        await ExecuteAsync(() => service.UpdateUserLastLoginAsync(id));
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id:guid}/delete")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GenericResponse<bool>>> DeleteUserById(Guid id) =>
         await ExecuteAsync(() => service.DeleteByIdAsync(id));
+
+    [HttpPatch("{id:guid}/disable")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GenericResponse<bool>>> DisableUserById(Guid id) =>
+        await ExecuteAsync(() => service.DisableByIdAsync(id));
 
     [HttpGet("types")]
     public IActionResult GetUserTypes()

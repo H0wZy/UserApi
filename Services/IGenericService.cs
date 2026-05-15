@@ -12,4 +12,5 @@ public interface IGenericService<TDto, in TCreateDto, in TUpdateDto>
     Task<GenericResponse<TDto>> CreateAsync(TCreateDto dto);
     Task<GenericResponse<TDto>> UpdateByIdAsync(Guid id, TUpdateDto dto);
     Task<GenericResponse<bool>> DeleteByIdAsync(Guid id);
+    Task<GenericResponse<bool>> DisableByIdAsync(Guid id);
 }

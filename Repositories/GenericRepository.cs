@@ -4,7 +4,7 @@ using user_api.cs.Models;
 
 namespace user_api.cs.Repositories;
 
-public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> where T : BaseEntity
+public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> where T : AccountEntity
 {
     protected readonly UserDbContext Context = ctx;
     private readonly DbSet<T> _dbSet = ctx.Set<T>();
@@ -28,11 +28,10 @@ public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> whe
 
     public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.AsNoTracking().ToListAsync();
 
-    public async Task<T?> GetByIdAsync(Guid id) => await _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+    public async Task<T?> GetByIdAsync(Guid id) => await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
 
     public async Task<T> UpdateAsync(T entity)
     {
-        Context.Entry(entity).State = EntityState.Modified;
         await Context.SaveChangesAsync();
         return entity;
     }

@@ -19,6 +19,7 @@ public class UserProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.IsDisabled, opt => opt.Ignore())
+            .ForMember(dest => dest.DisabledAt, opt => opt.Ignore())
             .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore())
             .ForMember(dest => dest.LastLogoutAt, opt => opt.Ignore())
             .ForMember(dest => dest.AcceptedTerms, opt => opt.Ignore())
