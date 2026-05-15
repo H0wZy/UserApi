@@ -17,7 +17,7 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (!dto.AcceptTerms) return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
 
         var cpfResult = Cpf.Create(dto.Cpf);
-        if (!cpfResult.Success)
+        if (cpfResult.IsFailure)
             return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
 
         if (await repository.GetCpfExistenceAsync(dto.Cpf))
@@ -58,7 +58,7 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
     public async Task<GenericResponse<UserDto>> GetUserByCpfAsync(string cpf)
     {
         var cpfResult = Cpf.Create(cpf);
-        if (!cpfResult.Success) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
+        if (cpfResult.IsFailure) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
 
         var user = await repository.GetByCpfAsync(cpfResult.Data!.Value);
         return user is null
