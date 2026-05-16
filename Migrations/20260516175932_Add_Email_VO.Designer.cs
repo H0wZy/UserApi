@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using user_api.cs.Data;
@@ -11,14 +12,11 @@ using user_api.cs.Data;
 namespace user_api.cs.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260516175932_Add_Email_VO")]
+    partial class _20260516175932_Add_Email_VO
     {
-        // If you encounter a merge conflict in the line below, it means you need to
-        // discard one of the migration branches and recreate its migrations on top of
-        // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-        public override string LatestMigrationId => "20260516183502_Remove_AcceptedTermsAt_Default";
-
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -13,19 +13,13 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker.Entries<BaseEntity>();
-
         foreach (var entry in entries)
         {
-            entry.Entity.UpdatedAt = entry.State switch
+            if (entry.State is EntityState.Modified)
             {
-                EntityState.Added or EntityState.Modified => DateTime.UtcNow,
-                _ => entry.Entity.UpdatedAt
-            };
-
-            if (entry.State == EntityState.Added)
-                entry.Entity.CreatedAt = DateTime.UtcNow;
+                entry.Entity.UpdatedAt = DateTime.UtcNow;
+            }
         }
-
         return await base.SaveChangesAsync(cancellationToken);
     }
 
@@ -55,6 +49,13 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                password.Property(p => p.Salt)
                    .HasColumnName("salt_password")
                    .HasColumnType("bytea")
+                   .IsRequired();
+            });
+            entity.OwnsOne(u => u.Email, email =>
+            {
+               email.Property(e => e.Value)
+                   .HasColumnName("email")
+                   .HasMaxLength(255)
                    .IsRequired();
             });
             entity.Property(u => u.UserType)

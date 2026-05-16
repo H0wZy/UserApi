@@ -5,7 +5,7 @@ namespace user_api.cs.Models;
 
 public abstract class BaseEntity
 {
-    [Key] [Column("id")] public Guid Id { get; set; }
-    [Column("created_at")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    [Column("updated_at")] public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    [Key] [Column("id")] public Guid Id { get; init; }
+    [Column("created_at")] public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    [Column("updated_at")] public DateTime? UpdatedAt { get; set; }
 }

@@ -7,33 +7,38 @@ namespace user_api.cs.Mappings;
 
 public class UserProfile : Profile
 {
+    /// <summary>
+    /// Responsabilidades da arquitetura:
+    /// <list type="bullet">
+    /// <item><description>DTO → transporte de dados</description></item>
+    /// <item><description>VO → invariantes e regras de domínio</description></item>
+    /// <item><description>Service → orquestra regras de negócio</description></item>
+    /// <item><description>AutoMapper → hidrata dados simples</description></item>
+    /// <item><description>EF Core → persistência</description></item>
+    /// </list>
+    /// </summary>
     public UserProfile()
     {
         // CreateUserDto → User
         CreateMap<CreateUserDto, User>()
-            // sistema controla — setados no service ou pelo EF
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            // Ignore obrigatório: DTO tem mesmo nome, mas são VOs setados manualmente
+            .ForMember(dest => dest.Email, opt => opt.Ignore())
             .ForMember(dest => dest.Cpf, opt => opt.Ignore())
             .ForMember(dest => dest.Password, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.IsDisabled, opt => opt.Ignore())
-            .ForMember(dest => dest.DisabledAt, opt => opt.Ignore())
-            .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore())
-            .ForMember(dest => dest.LastLogoutAt, opt => opt.Ignore())
-            .ForMember(dest => dest.AcceptedTerms, opt => opt.Ignore())
-            .ForMember(dest => dest.AcceptedTermsAt, opt => opt.Ignore())
-
-            // existem no DTO, mas não têm campos de tipos/nomes correspondentes no User
-            .ForSourceMember(src => src.Password, opt => opt.DoNotValidate())
-            .ForSourceMember(src => src.AcceptTerms, opt => opt.DoNotValidate());
+            .ForMember(dest => dest.BirthDate, opt => opt.Ignore())
+            // Source members sem correspondência válida no destino
+            .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.Cpf, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.Password, opt => opt.DoNotValidate());
 
         // UpdateUserDto → User (só atualiza campos não-nulos)
         CreateMap<UpdateUserDto, User>()
+            .ForMember(dest => dest.Email, opt => opt.Ignore())
             .ForAllMembers(opt => opt.Condition((_, _, srcMember) => srcMember is not null));
 
         // User → UserDto (convenção automática, só mapeia o que difere)
         CreateMap<User, UserDto>()
+            .ForCtorParam(nameof(UserDto.Email), opt => opt.MapFrom(src => src.Email.Value))
             .ForCtorParam(nameof(UserDto.Cpf), opt => opt.MapFrom(src => src.Cpf.Value))
             .ForCtorParam(nameof(UserDto.UserType), opt => opt.MapFrom(src => src.UserType.ToDescription()));
     }

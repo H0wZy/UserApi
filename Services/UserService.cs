@@ -1,9 +1,9 @@
 using AutoMapper;
+using user_api.cs.Constants;
 using user_api.cs.Dto;
 using user_api.cs.Models;
 using user_api.cs.Repositories;
 using user_api.cs.Shared;
-using user_api.cs.Utils;
 using user_api.cs.ValueObjects;
 
 namespace user_api.cs.Services;
@@ -14,14 +14,17 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
 
     public override async Task<GenericResponse<UserDto>> CreateAsync(CreateUserDto dto)
     {
-        if (!dto.AcceptTerms)
+        if (!dto.AcceptedTerms)
             return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
 
         var cpfResult = Cpf.Create(dto.Cpf);
         if (cpfResult.IsFailure) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
 
         var passwordResult = Password.Create(dto.Password);
-        if (passwordResult.IsFailure) return GenericResponse<UserDto>.BadRequest("Não foi possível criar o usuário.", passwordResult.Errors!);
+        if (passwordResult.IsFailure) return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, passwordResult.Errors!);
+
+        var emailResult = Email.Create(dto.Email);
+        if (emailResult.IsFailure) return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, emailResult.Errors!);
 
         if (await repository.GetCpfExistenceAsync(dto.Cpf))
             return GenericResponse<UserDto>.Conflict("Cpf já cadastrado.");
@@ -32,28 +35,38 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (await repository.GetUsernameExistenceAsync(dto.Username))
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
-        var user = _mapper.Map<User>(dto);
+        // Cria usuário apenas com campos/VO required/init only;
+        var user = new User
+        {
+            Email = emailResult.Data!,
+            Cpf = cpfResult.Data!,
+            Password = passwordResult.Data!,
+            BirthDate = dto.BirthDate,
+            AcceptedTerms = true,
+            AcceptedTermsAt = DateTime.UtcNow,
+        };
 
-        user.Cpf = cpfResult.Data!;
-        user.Password = passwordResult.Data!;
+        // Os demais são mapeados depois para aproveitar as validações do AutoMapper
+        _mapper.Map(dto, user);
 
-        user.AcceptedTerms = true;
-        user.AcceptedTermsAt = DateTime.UtcNow;
-
-        var created = await repository.CreateAsync(user);
-        return GenericResponse<UserDto>.Created(_mapper.Map<UserDto>(created));
+        var createdUser = await repository.CreateAsync(user);
+        return GenericResponse<UserDto>.Created(_mapper.Map<UserDto>(createdUser), UserResponse.CreationSuccess);
     }
 
     public async Task<GenericResponse<UserDto>> GetUserByEmailAsync(string email)
     {
         var user = await repository.GetByEmailAsync(email);
-        return user is null ? GenericResponse<UserDto>.NotFound() : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por email realizada com sucesso!");
+        return user is null
+            ? GenericResponse<UserDto>.NotFound()
+            : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por email realizada com sucesso!");
     }
 
     public async Task<GenericResponse<UserDto>> GetUserByUsernameAsync(string username)
     {
         var user = await repository.GetByUsernameAsync(username);
-        return user is null ? GenericResponse<UserDto>.NotFound() : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por username realizada com sucesso!");
+        return user is null
+            ? GenericResponse<UserDto>.NotFound()
+            : GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), "Busca por username realizada com sucesso!");
     }
 
     public async Task<GenericResponse<UserDto>> GetUserByCpfAsync(string cpf)

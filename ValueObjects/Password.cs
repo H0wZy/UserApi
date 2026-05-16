@@ -1,8 +1,10 @@
 ﻿using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 using user_api.cs.Shared;
 
 namespace user_api.cs.ValueObjects;
 
+[Owned]
 public sealed record Password
 {
     private const int MinLength = 8;
