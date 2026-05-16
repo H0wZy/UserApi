@@ -1,14 +1,17 @@
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using user_api.cs.Shared;
 
 namespace user_api.cs.ValueObjects;
 
+[Owned]
 public sealed partial record Cpf
 {
     public string Value { get; }
 
     public static Result<Cpf> Create(string value)
     {
+        if (!HasOnlyValidCharacters(value)) return Result<Cpf>.Fail("Cpf deve conter apenas dígitos, pontos ou traços.");
         value = RemoveFormatting(value);
         return !IsValid(value) ? Result<Cpf>.Fail("Cpf inválido!") : Result<Cpf>.Ok(new Cpf(value));
     }
@@ -45,7 +48,7 @@ public sealed partial record Cpf
         return numbers[10] == secondDigit;
     }
 
-    public override string ToString() => ConvertToFormatted(Value);
-
+    private static bool HasOnlyValidCharacters(string cpf) => cpf.All(c => char.IsDigit(c) || c is '.' or '-');
     private static string ConvertToFormatted(string cpf) => Convert.ToUInt64(cpf).ToString(@"000\.000\.000\-00");
+    public override string ToString() => ConvertToFormatted(Value);
 }
