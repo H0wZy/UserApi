@@ -17,8 +17,7 @@ public class User : AccountEntity
     [Column("cpf")] public required Cpf Cpf { get; set; }
     // TODO: CNPJ do Usuário
     // [Column("cnpj")] public Cnpj? Cnpj { get; private set; }
-    [Column("hash_password")] public byte[] HashPassword { get; set; } = [];
-    [Column("salt_password")] public byte[] SaltPassword { get; set; } = [];
+    public required Password Password { get; set; }
     [Column("birth_date")] public required DateOnly BirthDate { get; set; }
     [Column("accepted_terms")] public bool AcceptedTerms { get; set; }
     [Column("accepted_terms_at")] public DateTime? AcceptedTermsAt { get; set; }

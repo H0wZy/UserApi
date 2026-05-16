@@ -46,6 +46,17 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                     .HasMaxLength(11)
                     .IsRequired();
             });
+            entity.OwnsOne(u => u.Password, password =>
+            {
+               password.Property(p => p.Hash)
+                   .HasColumnName("hash_password")
+                   .HasColumnType("bytea")
+                   .IsRequired();
+               password.Property(p => p.Salt)
+                   .HasColumnName("salt_password")
+                   .HasColumnType("bytea")
+                   .IsRequired();
+            });
             entity.Property(u => u.UserType)
                 .HasConversion(converter)
                 .HasMaxLength(2)

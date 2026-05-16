@@ -3,8 +3,9 @@ namespace user_api.cs.Shared;
 public sealed record Result<T>
 {
     private bool IsSuccess { get; }
-    public string? Error { get; }
     public T? Data { get; }
+    public IReadOnlyCollection<string>? Errors { get; }
+    public string? Error => Errors?.FirstOrDefault();
 
     private Result(T? data)
     {
@@ -12,14 +13,15 @@ public sealed record Result<T>
         Data = data;
     }
 
-    private Result(string error)
+    private Result(IEnumerable<string> errors)
     {
         IsSuccess = false;
-        Error = error;
+        Errors = errors.ToList();
     }
 
     public bool IsFailure => !IsSuccess;
 
     public static Result<T> Ok(T data) => new(data);
-    public static Result<T> Fail(string error) => new(error);
+    public static Result<T> Fail(string error) => new([error]);
+    public static Result<T> Fail(IEnumerable<string> errors) => new(errors);
 }

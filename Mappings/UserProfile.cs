@@ -14,8 +14,7 @@ public class UserProfile : Profile
             // sistema controla — setados no service ou pelo EF
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.Cpf, opt => opt.Ignore())
-            .ForMember(dest => dest.HashPassword, opt => opt.Ignore())
-            .ForMember(dest => dest.SaltPassword, opt => opt.Ignore())
+            .ForMember(dest => dest.Password, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.IsDisabled, opt => opt.Ignore())
@@ -25,7 +24,7 @@ public class UserProfile : Profile
             .ForMember(dest => dest.AcceptedTerms, opt => opt.Ignore())
             .ForMember(dest => dest.AcceptedTermsAt, opt => opt.Ignore())
 
-            // existem no DTO, mas não têm campo correspondente no User
+            // existem no DTO, mas não têm campos de tipos/nomes correspondentes no User
             .ForSourceMember(src => src.Password, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.AcceptTerms, opt => opt.DoNotValidate());
 

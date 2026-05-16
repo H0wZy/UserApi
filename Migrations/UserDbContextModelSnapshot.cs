@@ -16,7 +16,7 @@ namespace user_api.cs.Migrations
         // If you encounter a merge conflict in the line below, it means you need to
         // discard one of the migration branches and recreate its migrations on top of
         // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-        public override string LatestMigrationId => "20260515154157_Add_DisabledAt_field";
+        public override string LatestMigrationId => "20260516003724_Add_Password_VO";
 
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -66,11 +66,6 @@ namespace user_api.cs.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("first_name");
 
-                    b.Property<byte[]>("HashPassword")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("hash_password");
-
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("boolean")
                         .HasColumnName("is_disabled");
@@ -88,11 +83,6 @@ namespace user_api.cs.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("last_name");
-
-                    b.Property<byte[]>("SaltPassword")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("salt_password");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -136,7 +126,33 @@ namespace user_api.cs.Migrations
                                 .HasForeignKey("UserId");
                         });
 
+                    b.OwnsOne("user_api.cs.ValueObjects.Password", "Password", b1 =>
+                        {
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<byte[]>("Hash")
+                                .IsRequired()
+                                .HasColumnType("bytea")
+                                .HasColumnName("hash_password");
+
+                            b1.Property<byte[]>("Salt")
+                                .IsRequired()
+                                .HasColumnType("bytea")
+                                .HasColumnName("salt_password");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.Navigation("Cpf")
+                        .IsRequired();
+
+                    b.Navigation("Password")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
