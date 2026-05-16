@@ -14,11 +14,14 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
 
     public override async Task<GenericResponse<UserDto>> CreateAsync(CreateUserDto dto)
     {
-        if (!dto.AcceptTerms) return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
+        if (!dto.AcceptTerms)
+            return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
 
         var cpfResult = Cpf.Create(dto.Cpf);
-        if (cpfResult.IsFailure)
-            return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
+        if (cpfResult.IsFailure) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
+
+        var passwordResult = Password.Create(dto.Password);
+        if (passwordResult.IsFailure) return GenericResponse<UserDto>.BadRequest("Não foi possível criar o usuário.", passwordResult.Errors!);
 
         if (await repository.GetCpfExistenceAsync(dto.Cpf))
             return GenericResponse<UserDto>.Conflict("Cpf já cadastrado.");
@@ -30,14 +33,12 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
         var user = _mapper.Map<User>(dto);
+
         user.Cpf = cpfResult.Data!;
+        user.Password = passwordResult.Data!;
 
         user.AcceptedTerms = true;
         user.AcceptedTermsAt = DateTime.UtcNow;
-
-        var (hash, salt) = PasswordHelper.HashPassword(dto.Password);
-        user.HashPassword = hash;
-        user.SaltPassword = salt;
 
         var created = await repository.CreateAsync(user);
         return GenericResponse<UserDto>.Created(_mapper.Map<UserDto>(created));
@@ -71,18 +72,18 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         var user = await repository.GetByIdAsync(id);
         if (user is null) return GenericResponse<bool>.NotFound();
 
+        var passwordResult = Password.Create(dto.NewPassword);
+        if (passwordResult.IsFailure) return GenericResponse<bool>.BadRequest("Não foi possível atualizar senha.", passwordResult.Errors!);
+
+        if (!user.Password.Verify(dto.CurrentPassword))
+            return GenericResponse<bool>.BadRequest("Senha atual inválida.");
         if (dto.CurrentPassword == dto.NewPassword)
             return GenericResponse<bool>.BadRequest("A nova senha não pode ser igual à senha atual.");
 
-        if (!PasswordHelper.VerifyPassword(dto.CurrentPassword, user.HashPassword, user.SaltPassword))
-            return GenericResponse<bool>.BadRequest("Senha atual inválida.");
-
-        var (newHash, newSalt) = PasswordHelper.HashPassword(dto.NewPassword);
-        user.HashPassword = newHash;
-        user.SaltPassword = newSalt;
+        user.Password = passwordResult.Data!;
 
         await repository.UpdateAsync(user);
-        return GenericResponse<bool>.Ok(true, "Senha atualizada com sucesso.");
+        return GenericResponse<bool>.Ok(true, "Senha atualizada com sucesso!");
     }
 
     public async Task<GenericResponse<bool>> UpdateUserLastLoginAsync(Guid id)

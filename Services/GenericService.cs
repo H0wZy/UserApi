@@ -45,7 +45,7 @@ public abstract class GenericService<TEntity, TDto, TCreateDto, TUpdateDto>(
      {
           var deleted = await repository.DeleteAsync(id);
           return deleted
-               ? GenericResponse<bool>.Ok(true, "Recurso excluído com sucesso.")
+               ? GenericResponse<bool>.Ok(true, "Recurso excluído com sucesso!")
                : GenericResponse<bool>.NotFound();
      }
 
@@ -58,6 +58,6 @@ public abstract class GenericService<TEntity, TDto, TCreateDto, TUpdateDto>(
           entity.DisabledAt = DateTime.UtcNow;
 
           await repository.UpdateAsync(entity);
-          return GenericResponse<bool>.Ok(true, "Recurso desativado com sucesso.");
+          return GenericResponse<bool>.Ok(true, "Recurso desativado com sucesso!");
      }
 }

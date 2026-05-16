@@ -19,10 +19,10 @@ public record GenericResponse<T>
         Errors = errors;
     }
 
-    public static GenericResponse<T> Ok(T data, string message = "Operação realizada com sucesso.") =>
+    public static GenericResponse<T> Ok(T data, string message = "Operação realizada com sucesso!") =>
         new(true, message, data, HttpStatusCode.OK);
 
-    public static GenericResponse<T> Created(T data, string message = "Recurso criado com sucesso.") =>
+    public static GenericResponse<T> Created(T data, string message = "Recurso criado com sucesso!") =>
         new(true, message, data, HttpStatusCode.Created);
 
     public static GenericResponse<T> NotFound(string message = "Recurso não encontrado.") =>
