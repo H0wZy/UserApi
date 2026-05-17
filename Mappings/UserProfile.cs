@@ -34,6 +34,7 @@ public class UserProfile : Profile
         // UpdateUserDto → User (só atualiza campos não-nulos)
         CreateMap<UpdateUserDto, User>()
             .ForMember(dest => dest.Email, opt => opt.Ignore())
+            .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
             .ForAllMembers(opt => opt.Condition((_, _, srcMember) => srcMember is not null));
 
         // User → UserDto (convenção automática, só mapeia o que difere)

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using user_api.cs.Enum;
 using user_api.cs.Models;
@@ -12,10 +13,13 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        ChangeTracker.DetectChanges();
+
         var entries = ChangeTracker.Entries<BaseEntity>();
         foreach (var entry in entries)
         {
-            if (entry.State is EntityState.Modified)
+            var ownedModified = HasModifiedOwnedEntities(entry);
+            if (entry.State is EntityState.Modified || (entry.State is EntityState.Unchanged && ownedModified))
             {
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
             }
@@ -62,6 +66,17 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                 .HasConversion(converter)
                 .HasMaxLength(2)
                 .IsRequired();
+        });
+    }
+
+    private static bool HasModifiedOwnedEntities(EntityEntry entry)
+    {
+        return entry.References.Any(r => r.TargetEntry is
+        {
+            State:
+            EntityState.Modified
+            or EntityState.Added
+            or EntityState.Deleted
         });
     }
 

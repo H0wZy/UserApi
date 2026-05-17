@@ -53,6 +53,55 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         return GenericResponse<UserDto>.Created(_mapper.Map<UserDto>(createdUser), UserResponse.CreationSuccess);
     }
 
+    public override async Task<GenericResponse<UserDto>> UpdateByIdAsync(Guid id, UpdateUserDto dto)
+    {
+        var user = await repository.GetByIdAsync(id);
+        if (user is null) return GenericResponse<UserDto>.NotFound(UserResponse.NotFound);
+
+        dto = new UpdateUserDto(
+            Username: string.IsNullOrWhiteSpace(dto.Username) ? null : dto.Username.Trim(),
+            Email: string.IsNullOrWhiteSpace(dto.Email) ? null : dto.Email.Trim(),
+            FirstName: string.IsNullOrWhiteSpace(dto.FirstName) ? null : dto.FirstName.Trim(),
+            LastName: string.IsNullOrWhiteSpace(dto.LastName) ? null : dto.LastName.Trim());
+
+        if (dto.Username is null && dto.Email is null && dto.FirstName is null && dto.LastName is null)
+            return GenericResponse<UserDto>.BadRequest("Nenhum campo foi informado para atualização.");
+
+        if (dto.FirstName is { Length: < 3 or > 50 })
+            return GenericResponse<UserDto>.BadRequest("O nome deve conter entre 3 e 50 caracteres.");
+
+        if (dto.Username is { Length: < 3 or > 50 })
+            return GenericResponse<UserDto>.BadRequest("O nome de usuário deve conter entre 3 e 50 caracteres.");
+
+        if (dto.LastName is { Length: < 3 or > 50 })
+            return GenericResponse<UserDto>.BadRequest("O sobrenome deve conter entre 3 e 50 caracteres.");
+
+        if (dto.Email is not null)
+        {
+            var emailResult = Email.Create(dto.Email);
+            if (emailResult.IsFailure)
+                return GenericResponse<UserDto>.BadRequest(UserResponse.UpdateFailed, emailResult.Errors!);
+
+            var validatedEmail = emailResult.Data!;
+
+            if (user.Email == validatedEmail)
+                return GenericResponse<UserDto>.Conflict("O email informado é igual ao email atual.");
+
+            if (await repository.GetEmailExistenceAsync(validatedEmail.Value))
+                return GenericResponse<UserDto>.Conflict("Email já cadastrado.");
+
+            user.Email = validatedEmail;
+        }
+
+        if (dto.Username is not null && await repository.GetUsernameExistenceAsync(dto.Username))
+            return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
+
+        _mapper.Map(dto, user);
+
+        await repository.UpdateAsync(user);
+        return GenericResponse<UserDto>.Ok(_mapper.Map<UserDto>(user), UserResponse.UpdateSuccess);
+    }
+
     public async Task<GenericResponse<UserDto>> GetUserByEmailAsync(string email)
     {
         var user = await repository.GetByEmailAsync(email);
@@ -105,6 +154,16 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (user is null) return GenericResponse<bool>.NotFound();
 
         user.LastLoginAt = DateTime.UtcNow;
+        await repository.UpdateAsync(user);
+        return GenericResponse<bool>.Ok(true);
+    }
+
+    public async Task<GenericResponse<bool>> UpdateUserLastLogoutAsync(Guid id)
+    {
+        var user = await repository.GetByIdAsync(id);
+        if (user is null) return GenericResponse<bool>.NotFound(UserResponse.NotFound);
+
+        user.LastLogoutAt = DateTime.UtcNow;
         await repository.UpdateAsync(user);
         return GenericResponse<bool>.Ok(true);
     }
