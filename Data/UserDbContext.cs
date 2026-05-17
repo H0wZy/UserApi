@@ -13,13 +13,9 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        ChangeTracker.DetectChanges();
-
-        var entries = ChangeTracker.Entries<BaseEntity>();
-        foreach (var entry in entries)
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
-            var ownedModified = HasModifiedOwnedEntities(entry);
-            if (entry.State is EntityState.Modified || (entry.State is EntityState.Unchanged && ownedModified))
+            if (ShouldUpdateAudit(entry))
             {
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
             }
@@ -69,7 +65,26 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         });
     }
 
-    private static bool HasModifiedOwnedEntities(EntityEntry entry)
+    private static bool ShouldUpdateAudit(EntityEntry<BaseEntity> entry)
+    {
+        var hasChangedOwnedEntities = HasChangedOwnedEntities(entry);
+        var hasRelevantChanges = HasRelevantChanges(entry);
+        return hasRelevantChanges || (entry.State is EntityState.Unchanged && hasChangedOwnedEntities);
+    }
+
+    private static bool HasRelevantChanges(EntityEntry entry)
+    {
+        return entry.Properties.Any(p => p.IsModified && !IgnoredAuditProperties.Contains(p.Metadata.Name));
+    }
+
+    private static readonly HashSet<string> IgnoredAuditProperties =
+    [
+        nameof(AccountEntity.LastLoginAt),
+        nameof(AccountEntity.LastLogoutAt),
+        nameof(BaseEntity.UpdatedAt)
+    ];
+
+    private static bool HasChangedOwnedEntities(EntityEntry entry)
     {
         return entry.References.Any(r => r.TargetEntry is
         {
@@ -85,7 +100,7 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         var map = new Dictionary<string, UserType>
         {
             ["PF"] = UserType.Individual,
-            ["PJ"] = UserType.Company,
+            ["PJ"] = UserType.Company
         };
 
         return map.TryGetValue(value, out var type) ? type : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
