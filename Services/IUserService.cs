@@ -10,4 +10,5 @@ public interface IUserService : IGenericService<UserDto, CreateUserDto, UpdateUs
     Task<GenericResponse<UserDto>> GetUserByCpfAsync(string cpf);
     Task<GenericResponse<bool>> UpdateUserPasswordAsync(Guid id, UpdatePasswordDto dto);
     Task<GenericResponse<bool>> UpdateUserLastLoginAsync(Guid id);
+    Task<GenericResponse<bool>> UpdateUserLastLogoutAsync(Guid id);
 }

@@ -48,7 +48,7 @@ public class UserController(IUserService service) : ControllerBase
     public async Task<ActionResult<GenericResponse<UserDto>>> CreateUser([FromBody] CreateUserDto dto) =>
         await ExecuteAsync(() => service.CreateAsync(dto));
 
-    [HttpPut("{id:guid}/update")]
+    [HttpPatch("{id:guid}/update")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -67,6 +67,12 @@ public class UserController(IUserService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogin(Guid id) =>
         await ExecuteAsync(() => service.UpdateUserLastLoginAsync(id));
+
+    [HttpPatch("{id:guid}/last-logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogout(Guid id) =>
+        await ExecuteAsync(() => service.UpdateUserLastLogoutAsync(id));
 
     [HttpDelete("{id:guid}/delete")]
     [ProducesResponseType(StatusCodes.Status200OK)]
