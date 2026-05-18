@@ -86,7 +86,7 @@ public class UserController(IUserService service, IAuthService authService) : Co
     public async Task<ActionResult<GenericResponse<bool>>> DisableUserById(Guid id) =>
         await ExecuteAsync(() => service.DisableByIdAsync(id));
 
-    [HttpPost("/login")]
+    [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GenericResponse<TokenDto>>> Login(LoginDto dto) =>

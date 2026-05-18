@@ -1,6 +1,5 @@
 using user_api.cs.Constants;
 using user_api.cs.Dto;
-using user_api.cs.Models;
 using user_api.cs.Repositories;
 using user_api.cs.Shared;
 
