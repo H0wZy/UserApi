@@ -19,6 +19,9 @@ public class UserProfile : Profile
     /// </summary>
     public UserProfile()
     {
+        // TODO FIXME: Preciso mapear LoginDto e TokenDto?
+        // TODO FIXME: Preciso mapear campos IsOnline e LoginMethod da AccountEntity?
+
         // CreateUserDto → User
         CreateMap<CreateUserDto, User>()
             // Ignore obrigatório: DTO tem mesmo nome, mas são VOs setados manualmente

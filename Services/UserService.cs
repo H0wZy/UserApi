@@ -153,7 +153,9 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         var user = await repository.GetByIdAsync(id);
         if (user is null) return GenericResponse<bool>.NotFound();
 
+        user.IsOnline = true;
         user.LastLoginAt = DateTime.UtcNow;
+
         await repository.UpdateAsync(user);
         return GenericResponse<bool>.Ok(true);
     }

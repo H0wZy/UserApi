@@ -63,6 +63,6 @@ public sealed record Password
     public bool Verify(string plainPassword)
     {
         var verifyHash = Rfc2898DeriveBytes.Pbkdf2(plainPassword, Salt, Iterations, HashAlgorithmName.SHA256, OutputLength);
-        return verifyHash.SequenceEqual(Hash);
+        return CryptographicOperations.FixedTimeEquals(verifyHash, Hash);
     }
 }

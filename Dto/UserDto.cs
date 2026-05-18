@@ -8,12 +8,14 @@ public record UserDto(
     DateOnly BirthDate,
     string Cpf,
     string UserType,
-    bool IsDisabled,
-    DateTime? DisabledAt,
     bool AcceptedTerms,
     DateTime? AcceptedTermsAt,
-    DateTime CreatedAt,
-    DateTime? UpdatedAt,
+    bool IsDisabled,
+    DateTime? DisabledAt,
+    bool IsOnline,
+    string? LoginMethod,
     DateTime? LastLoginAt,
-    DateTime? LastLogoutAt
+    DateTime? LastLogoutAt,
+    DateTime CreatedAt,
+    DateTime? UpdatedAt
 );
