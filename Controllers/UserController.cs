@@ -9,7 +9,7 @@ namespace user_api.cs.Controllers;
 
 [ApiController]
 [Route("api/v1/users")]
-public class UserController(IUserService service) : ControllerBase
+public class UserController(IUserService service, IAuthService authService) : ControllerBase
 {
     [HttpGet("get-all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -85,6 +85,12 @@ public class UserController(IUserService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GenericResponse<bool>>> DisableUserById(Guid id) =>
         await ExecuteAsync(() => service.DisableByIdAsync(id));
+
+    [HttpPost("/login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<GenericResponse<TokenDto>>> Login(LoginDto dto) =>
+        await ExecuteAsync(() => authService.LoginAsync(dto));
 
     [HttpGet("types")]
     public IActionResult GetUserTypes()

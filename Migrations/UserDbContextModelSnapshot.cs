@@ -16,7 +16,7 @@ namespace user_api.cs.Migrations
         // If you encounter a merge conflict in the line below, it means you need to
         // discard one of the migration branches and recreate its migrations on top of
         // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-        public override string LatestMigrationId => "20260516183502_Remove_AcceptedTermsAt_Default";
+        public override string LatestMigrationId => "20260518033922_Add_More_Audit_Fields";
 
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -64,6 +64,10 @@ namespace user_api.cs.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_disabled");
 
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_online");
+
                     b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_login_at");
@@ -77,6 +81,10 @@ namespace user_api.cs.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("last_name");
+
+                    b.Property<string>("LoginMethod")
+                        .HasColumnType("text")
+                        .HasColumnName("login_method");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")

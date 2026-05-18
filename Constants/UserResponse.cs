@@ -13,4 +13,5 @@ public static class UserResponse
 
         public const string DeleteSuccess = "Usuário deletado com sucesso!";
         public const string DeleteFailed = "Não foi possível deletar o usuário.";
+        public const string InvalidCredentials = "Credenciais inválidas.";
 }
