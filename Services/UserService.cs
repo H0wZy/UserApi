@@ -148,11 +148,12 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         return GenericResponse<bool>.Ok(true, "Senha atualizada com sucesso!");
     }
 
-    public async Task<GenericResponse<bool>> UpdateUserLastLoginAsync(Guid id)
+    public async Task<GenericResponse<bool>> UpdateUserLastLoginAsync(Guid id, string loginMethod)
     {
         var user = await repository.GetByIdAsync(id);
         if (user is null) return GenericResponse<bool>.NotFound();
 
+        user.LoginMethod = loginMethod;
         user.IsOnline = true;
         user.LastLoginAt = DateTime.UtcNow;
 

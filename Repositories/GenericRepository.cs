@@ -32,6 +32,7 @@ public class GenericRepository<T>(UserDbContext ctx) : IGenericRepository<T> whe
 
     public async Task<T> UpdateAsync(T entity)
     {
+        Context.Update(entity);
         await Context.SaveChangesAsync();
         return entity;
     }

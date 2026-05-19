@@ -62,12 +62,6 @@ public class UserController(IUserService service, IAuthService authService) : Co
     public async Task<ActionResult<GenericResponse<bool>>> UpdatePassword(Guid id, [FromBody] UpdatePasswordDto dto) =>
         await ExecuteAsync(() => service.UpdateUserPasswordAsync(id, dto));
 
-    [HttpPatch("{id:guid}/last-login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<GenericResponse<bool>>> UpdateLastLogin(Guid id) =>
-        await ExecuteAsync(() => service.UpdateUserLastLoginAsync(id));
-
     [HttpPatch("{id:guid}/last-logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
