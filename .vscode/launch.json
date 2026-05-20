@@ -2,6 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
+      // TODO FIXME: Arrumar launch.json do vscode utilizando ReSharper
       "name": ".NET Watch Launch (Hot Reload)",
       "type": "coreclr",
       "request": "launch",
