@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/user-api.cs.sln",
+        "${workspaceFolder}/UserApi.sln",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary;ForceNoAlign"
       ],
@@ -19,7 +19,7 @@
       "type": "process",
       "args": [
         "publish",
-        "${workspaceFolder}/user-api.cs.sln",
+        "${workspaceFolder}/UserApi.sln",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary;ForceNoAlign"
       ],
@@ -33,7 +33,7 @@
         "watch",
         "run",
         "--project",
-        "${workspaceFolder}/user-api.cs.csproj"
+        "${workspaceFolder}/src/UserApi/UserApi.csproj"
       ],
       "isBackground": true,
       "problemMatcher": "$msCompile"

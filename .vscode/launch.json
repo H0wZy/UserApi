@@ -12,7 +12,7 @@
         "watch",
         "run",
         "--project",
-        "${workspaceFolder}/user-api.cs.csproj"
+        "${workspaceFolder}/src/UserApi/UserApi.csproj"
       ],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
