@@ -2,7 +2,7 @@ namespace UserApi.Shared;
 
 public sealed record Result<T>
 {
-    private bool IsSuccess { get; }
+    public bool IsSuccess { get; }
     public T? Data { get; }
     public IReadOnlyCollection<string>? Errors { get; }
     public string? Error => Errors?.FirstOrDefault();
