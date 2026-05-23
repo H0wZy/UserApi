@@ -1,4 +1,5 @@
 ﻿using UserApi.ValueObjects;
+using Xunit;
 
 namespace UserApi.Tests;
 
