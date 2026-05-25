@@ -9,25 +9,30 @@ public sealed partial record Cpf
 {
     public string Value { get; }
 
-    public static Result<Cpf> Create(string value)
+    public static Result<Cpf> Create(string? plainCpf)
     {
-        if (!HasOnlyValidCharacters(value)) return Result<Cpf>.Fail("Cpf deve conter apenas dígitos, pontos ou traços.");
-        value = RemoveFormatting(value);
-        return !IsValid(value) ? Result<Cpf>.Fail("Cpf inválido!") : Result<Cpf>.Ok(new Cpf(value));
+        if (string.IsNullOrWhiteSpace(plainCpf))
+            return Result<Cpf>.Fail("Cpf não pode ser nulo ou vazio.");
+
+        if (!HasOnlyValidCharacters(plainCpf))
+            return Result<Cpf>.Fail("Cpf deve conter apenas dígitos, pontos ou traços.");
+
+        var normalizedCpf = RemoveFormatting(plainCpf);
+
+        return !IsValid(normalizedCpf)
+            ? Result<Cpf>.Fail("Cpf inválido!")
+            : Result<Cpf>.Ok(new Cpf(normalizedCpf));
     }
 
     private Cpf(string value) => Value = value;
 
     [GeneratedRegex(@"[^\d]")]
     private static partial Regex NonDigitsRegex();
+
     private static string RemoveFormatting(string value) => NonDigitsRegex().Replace(value, "");
 
     private static bool IsValid(string cpf)
     {
-        if (string.IsNullOrWhiteSpace(cpf)) return false;
-
-        cpf = RemoveFormatting(cpf);
-
         if (cpf.Length is not 11) return false;
         if (cpf.All(c => c == cpf[0])) return false;
 

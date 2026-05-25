@@ -6,7 +6,7 @@ namespace UserApi.ValueObjects;
 [Owned]
 public sealed record Email
 {
-    private const int MaxLength = 255;
+    private const int MaxLength = 64;
 
     public string Value { get; }
 
@@ -16,9 +16,9 @@ public sealed record Email
     {
         var normalized = plainEmail?.Trim().ToLowerInvariant() ?? string.Empty;
         var validation = IsValid(normalized);
-        return validation.IsFailure
-            ? Result<Email>.Fail(validation.Errors!)
-            : Result<Email>.Ok(new Email(normalized));
+        return validation.IsSuccess
+            ? Result<Email>.Ok(new Email(normalized))
+            : Result<Email>.Fail(validation.Errors!);
     }
 
     private static Result<string> IsValid(string email)
