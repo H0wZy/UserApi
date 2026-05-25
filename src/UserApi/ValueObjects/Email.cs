@@ -14,10 +14,10 @@ public sealed record Email
 
     public static Result<Email> Create(string? plainEmail)
     {
-        var normalized = plainEmail?.Trim().ToLowerInvariant() ?? string.Empty;
-        var validation = IsValid(normalized);
+        var normalizedEmail = plainEmail?.Trim().ToLowerInvariant() ?? string.Empty;
+        var validation = IsValid(normalizedEmail);
         return validation.IsSuccess
-            ? Result<Email>.Ok(new Email(normalized))
+            ? Result<Email>.Ok(new Email(normalizedEmail))
             : Result<Email>.Fail(validation.Errors!);
     }
 

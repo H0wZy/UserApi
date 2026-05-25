@@ -30,10 +30,10 @@ public sealed partial record Username
 
     public static Result<Username> Create(string? plainUsername)
     {
-        var normalized = plainUsername?.Trim().ToLowerInvariant() ?? string.Empty;
-        var validation = IsValid(normalized);
+        var normalizedUsername = plainUsername?.Trim().ToLowerInvariant() ?? string.Empty;
+        var validation = IsValid(normalizedUsername);
         return validation.IsSuccess
-            ? Result<Username>.Ok(new Username(normalized))
+            ? Result<Username>.Ok(new Username(normalizedUsername))
             : Result<Username>.Fail(validation.Errors!);
     }
 

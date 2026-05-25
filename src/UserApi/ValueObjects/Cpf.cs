@@ -19,9 +19,9 @@ public sealed partial record Cpf
 
         var normalizedCpf = RemoveFormatting(plainCpf);
 
-        return !IsValid(normalizedCpf)
-            ? Result<Cpf>.Fail("Cpf inválido!")
-            : Result<Cpf>.Ok(new Cpf(normalizedCpf));
+        return IsValid(normalizedCpf)
+            ? Result<Cpf>.Ok(new Cpf(normalizedCpf))
+            : Result<Cpf>.Fail("Cpf inválido!");
     }
 
     private Cpf(string value) => Value = value;
