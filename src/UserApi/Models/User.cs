@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UserApi.Enum;
 using UserApi.ValueObjects;
@@ -10,9 +9,8 @@ public class User : AccountEntity
 {
     public required Username Username { get; set; }
     public required Email Email { get; set; }
-    [Column("first_name"), MaxLength(255)] public string FirstName { get; set; } = string.Empty;
-    [Column("last_name"), MaxLength(255)] public string LastName { get; set; } = string.Empty;
-    [NotMapped] public string FullName => $"{FirstName} {LastName}";
+    public required Name Name { get; set; }
+    [NotMapped] public string FullName => Name.FullName;
     // TODO: Criar VO PhoneNumber
     // [Column("phone_number")] public PhoneNumber? PhoneNumber { get; set; }
     [Column("user_type")] public UserType UserType { get; init; }

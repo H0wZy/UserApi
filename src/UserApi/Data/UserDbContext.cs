@@ -66,6 +66,17 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                     .HasMaxLength(64)
                     .IsRequired();
             });
+            entity.OwnsOne(u => u.Name, name =>
+            {
+                name.Property(n => n.FirstName)
+                    .HasColumnName("first_name")
+                    .HasMaxLength(50)
+                    .IsRequired();
+                name.Property(n => n.LastName)
+                    .HasColumnName("last_name")
+                    .HasMaxLength(50)
+                    .IsRequired();
+            });
             entity.Property(u => u.UserType)
                 .HasConversion(converter)
                 .HasMaxLength(2)
