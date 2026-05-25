@@ -22,14 +22,15 @@ public class TokenService(IConfiguration config) : ITokenService
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new(JwtRegisteredClaimNames.UniqueName, user.Username.Value),
             new(JwtRegisteredClaimNames.Email, user.Email.Value),
             new(JwtRegisteredClaimNames.Name, user.FullName),
             new(ClaimTypes.SerialNumber, user.Cpf.Value),
             new(ClaimTypes.DateOfBirth, user.BirthDate.ToString("yyyy-MM-dd")),
             new(ClaimTypes.Role, user.UserType.ToDescription()),
             new(ClaimTypes.AuthenticationMethod, loginMethod),
-            new(JwtRegisteredClaimNames.AuthTime, new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+            new(JwtRegisteredClaimNames.AuthTime,
+                new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));

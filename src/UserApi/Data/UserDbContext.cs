@@ -20,6 +20,7 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
             }
         }
+
         return await base.SaveChangesAsync(cancellationToken);
     }
 
@@ -42,21 +43,28 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
             });
             entity.OwnsOne(u => u.Password, password =>
             {
-               password.Property(p => p.Hash)
-                   .HasColumnName("hash_password")
-                   .HasColumnType("bytea")
-                   .IsRequired();
-               password.Property(p => p.Salt)
-                   .HasColumnName("salt_password")
-                   .HasColumnType("bytea")
-                   .IsRequired();
+                password.Property(p => p.Hash)
+                    .HasColumnName("hash_password")
+                    .HasColumnType("bytea")
+                    .IsRequired();
+                password.Property(p => p.Salt)
+                    .HasColumnName("salt_password")
+                    .HasColumnType("bytea")
+                    .IsRequired();
+            });
+            entity.OwnsOne(u => u.Username, username =>
+            {
+                username.Property(u => u.Value)
+                    .HasColumnName("username")
+                    .HasMaxLength(20)
+                    .IsRequired();
             });
             entity.OwnsOne(u => u.Email, email =>
             {
-               email.Property(e => e.Value)
-                   .HasColumnName("email")
-                   .HasMaxLength(255)
-                   .IsRequired();
+                email.Property(e => e.Value)
+                    .HasColumnName("email")
+                    .HasMaxLength(64)
+                    .IsRequired();
             });
             entity.Property(u => u.UserType)
                 .HasConversion(converter)
@@ -103,6 +111,8 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
             ["PJ"] = UserType.Company
         };
 
-        return map.TryGetValue(value, out var type) ? type : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
+        return map.TryGetValue(value, out var type)
+            ? type
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
     }
 }

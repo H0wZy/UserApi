@@ -8,7 +8,8 @@ using UserApi.ValueObjects;
 
 namespace UserApi.Services;
 
-public class UserService(IUserRepository repository, IMapper mapper) : GenericService<User, UserDto, CreateUserDto, UpdateUserDto>(repository, mapper), IUserService
+public class UserService(IUserRepository repository, IMapper mapper)
+    : GenericService<User, UserDto, CreateUserDto, UpdateUserDto>(repository, mapper), IUserService
 {
     private readonly IMapper _mapper = mapper;
 
@@ -21,23 +22,32 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (cpfResult.IsFailure) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
 
         var passwordResult = Password.Create(dto.Password);
-        if (passwordResult.IsFailure) return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, passwordResult.Errors!);
+        if (passwordResult.IsFailure)
+            return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, passwordResult.Errors!);
 
         var emailResult = Email.Create(dto.Email);
-        if (emailResult.IsFailure) return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, emailResult.Errors!);
+        if (emailResult.IsFailure)
+            return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, emailResult.Errors!);
+
+        var usernameResult = Username.Create(dto.Username);
+        if (usernameResult.IsFailure)
+            return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, usernameResult.Errors!);
+
+        var username = usernameResult.Data!;
 
         if (await repository.GetCpfExistenceAsync(dto.Cpf))
             return GenericResponse<UserDto>.Conflict("Cpf já cadastrado.");
 
         if (await repository.GetEmailExistenceAsync(dto.Email))
             return GenericResponse<UserDto>.Conflict("Email já cadastrado.");
-            
-        if (await repository.GetUsernameExistenceAsync(dto.Username))
+
+        if (await repository.GetUsernameExistenceAsync(username.Value))
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
         // Cria usuário apenas com campos/VO required/init only;
         var user = new User
         {
+            Username = username,
             Email = emailResult.Data!,
             Cpf = cpfResult.Data!,
             Password = passwordResult.Data!,
@@ -67,14 +77,31 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (dto.Username is null && dto.Email is null && dto.FirstName is null && dto.LastName is null)
             return GenericResponse<UserDto>.BadRequest("Nenhum campo foi informado para atualização.");
 
+        //  TODO FIXME: Magic numbers
         if (dto.FirstName is { Length: < 3 or > 50 })
             return GenericResponse<UserDto>.BadRequest("O nome deve conter entre 3 e 50 caracteres.");
 
-        if (dto.Username is { Length: < 3 or > 50 })
-            return GenericResponse<UserDto>.BadRequest("O nome de usuário deve conter entre 3 e 50 caracteres.");
-
+        //  TODO FIXME: Magic numbers
         if (dto.LastName is { Length: < 3 or > 50 })
             return GenericResponse<UserDto>.BadRequest("O sobrenome deve conter entre 3 e 50 caracteres.");
+
+        if (dto.Username is not null)
+        {
+            var usernameResult = Username.Create(dto.Username);
+            if (usernameResult.IsFailure)
+                return GenericResponse<UserDto>.BadRequest(UserResponse.UpdateFailed, usernameResult.Errors!);
+
+            var validatedUsername = usernameResult.Data!;
+
+            if (user.Username == validatedUsername)
+                return GenericResponse<UserDto>.Conflict(
+                    "O nome de usuário informado é igual ao nome de usuário  atual.");
+
+            if (await repository.GetUsernameExistenceAsync(validatedUsername.Value))
+                return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
+
+            user.Username = validatedUsername;
+        }
 
         if (dto.Email is not null)
         {
@@ -92,9 +119,6 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
 
             user.Email = validatedEmail;
         }
-
-        if (dto.Username is not null && await repository.GetUsernameExistenceAsync(dto.Username))
-            return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
         _mapper.Map(dto, user);
 
@@ -135,7 +159,8 @@ public class UserService(IUserRepository repository, IMapper mapper) : GenericSe
         if (user is null) return GenericResponse<bool>.NotFound();
 
         var passwordResult = Password.Create(dto.NewPassword);
-        if (passwordResult.IsFailure) return GenericResponse<bool>.BadRequest("Não foi possível atualizar senha.", passwordResult.Errors!);
+        if (passwordResult.IsFailure)
+            return GenericResponse<bool>.BadRequest("Não foi possível atualizar senha.", passwordResult.Errors!);
 
         if (!user.Password.Verify(dto.CurrentPassword))
             return GenericResponse<bool>.BadRequest("Senha atual inválida.");

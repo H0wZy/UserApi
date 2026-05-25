@@ -8,7 +8,7 @@ namespace UserApi.Models;
 [Table("users")]
 public class User : AccountEntity
 {
-    [Column("username"), MaxLength(255)] public string Username { get; set; } = string.Empty;
+    public required Username Username { get; set; }
     public required Email Email { get; set; }
     [Column("first_name"), MaxLength(255)] public string FirstName { get; set; } = string.Empty;
     [Column("last_name"), MaxLength(255)] public string LastName { get; set; } = string.Empty;

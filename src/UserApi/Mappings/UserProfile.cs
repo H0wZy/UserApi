@@ -25,23 +25,28 @@ public class UserProfile : Profile
         // CreateUserDto → User
         CreateMap<CreateUserDto, User>()
             // Ignore obrigatório: DTO tem mesmo nome, mas são VOs setados manualmente
+            .ForMember(dest => dest.Username, opt => opt.Ignore())
             .ForMember(dest => dest.Email, opt => opt.Ignore())
             .ForMember(dest => dest.Cpf, opt => opt.Ignore())
             .ForMember(dest => dest.Password, opt => opt.Ignore())
             .ForMember(dest => dest.BirthDate, opt => opt.Ignore())
             // Source members sem correspondência válida no destino
+            .ForSourceMember(src => src.Username, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.Cpf, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.Password, opt => opt.DoNotValidate());
 
         // UpdateUserDto → User (só atualiza campos não-nulos)
         CreateMap<UpdateUserDto, User>()
+            .ForMember(dest => dest.Username, opt => opt.Ignore())
+            .ForSourceMember(src => src.Username, opt => opt.DoNotValidate())
             .ForMember(dest => dest.Email, opt => opt.Ignore())
             .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
             .ForAllMembers(opt => opt.Condition((_, _, srcMember) => srcMember is not null));
 
         // User → UserDto (convenção automática, só mapeia o que difere)
         CreateMap<User, UserDto>()
+            .ForCtorParam(nameof(UserDto.Username), opt => opt.MapFrom(src => src.Username.Value))
             .ForCtorParam(nameof(UserDto.Email), opt => opt.MapFrom(src => src.Email.Value))
             .ForCtorParam(nameof(UserDto.Cpf), opt => opt.MapFrom(src => src.Cpf.Value))
             .ForCtorParam(nameof(UserDto.UserType), opt => opt.MapFrom(src => src.UserType.ToDescription()));

@@ -4,7 +4,7 @@ using UserApi.Enum;
 namespace UserApi.Dto;
 
 public record CreateUserDto(
-    [MinLength(3), MaxLength(50)] string Username,
+    string Username,
     string Email,
     [MinLength(3), MaxLength(255)] string FirstName,
     [MinLength(3), MaxLength(255)] string LastName,
