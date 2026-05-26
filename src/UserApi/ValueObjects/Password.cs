@@ -22,8 +22,11 @@ public sealed record Password
         Salt = salt;
     }
 
-    public static Result<Password> Create(string plainPassword)
+    public static Result<Password> Create(string? plainPassword)
     {
+        if (string.IsNullOrWhiteSpace(plainPassword))
+            return Result<Password>.Fail("A senha não pode ser vazia.");
+
         var validation = IsValid(plainPassword);
 
         if (validation.IsFailure)
@@ -40,9 +43,6 @@ public sealed record Password
     private static Result<string> IsValid(string password)
     {
         var errors = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(password))
-            errors.Add("A senha não pode ser vazia.");
 
         if (!password.Any(char.IsUpper))
             errors.Add("A senha deve conter pelo menos uma letra maiúscula.");
@@ -62,7 +62,8 @@ public sealed record Password
     // Utilizado para verificar senha no login ou mudança de senha.
     public bool Verify(string plainPassword)
     {
-        var verifyHash = Rfc2898DeriveBytes.Pbkdf2(plainPassword, Salt, Iterations, HashAlgorithmName.SHA256, OutputLength);
+        var verifyHash =
+            Rfc2898DeriveBytes.Pbkdf2(plainPassword, Salt, Iterations, HashAlgorithmName.SHA256, OutputLength);
         return CryptographicOperations.FixedTimeEquals(verifyHash, Hash);
     }
 }
