@@ -1,6 +1,6 @@
 using UserApi.ValueObjects;
 
-namespace UserApi.Tests;
+namespace UserApi.Tests.ValueObjects;
 
 public class PhoneNumberTest
 {
