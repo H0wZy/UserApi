@@ -37,6 +37,15 @@ public class UserService(IUserRepository repository, IMapper mapper)
         if (nameResult.IsFailure)
             return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, nameResult.Errors!);
 
+        PhoneNumber? phoneNumber = null;
+        if (dto.PhoneNumber is not null)
+        {
+            var phoneNumberResult = PhoneNumber.Create(dto.PhoneNumber);
+            if (phoneNumberResult.IsFailure)
+                return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, phoneNumberResult.Errors!);
+            phoneNumber = phoneNumberResult.Data!;
+        }
+
         var cpf = cpfResult.Data!;
         var password = passwordResult.Data!;
         var username = usernameResult.Data!;
@@ -52,12 +61,15 @@ public class UserService(IUserRepository repository, IMapper mapper)
         if (await repository.GetUsernameExistenceAsync(username.Value))
             return GenericResponse<UserDto>.Conflict("Nome de usuário já cadastrado.");
 
+        // TODO: Verificar existencia de número de telefone.
+
         // Cria usuário apenas com campos/VO required/init only;
         var user = new User
         {
             Username = username,
             Email = email,
             Name = name,
+            PhoneNumber = phoneNumber,
             Cpf = cpf,
             Password = password,
             BirthDate = dto.BirthDate,
@@ -81,9 +93,11 @@ public class UserService(IUserRepository repository, IMapper mapper)
             Username: string.IsNullOrWhiteSpace(dto.Username) ? null : dto.Username.Trim(),
             Email: string.IsNullOrWhiteSpace(dto.Email) ? null : dto.Email.Trim(),
             FirstName: string.IsNullOrWhiteSpace(dto.FirstName) ? null : dto.FirstName.Trim(),
-            LastName: string.IsNullOrWhiteSpace(dto.LastName) ? null : dto.LastName.Trim());
+            LastName: string.IsNullOrWhiteSpace(dto.LastName) ? null : dto.LastName.Trim(),
+            PhoneNumber: string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim()
+        );
 
-        if (dto.Username is null && dto.Email is null && dto.FirstName is null && dto.LastName is null)
+        if (dto.Username is null && dto.Email is null && dto.FirstName is null && dto.LastName is null && dto.PhoneNumber is null)
             return GenericResponse<UserDto>.BadRequest("Nenhum campo foi informado para atualização.");
 
         if (dto.FirstName is not null || dto.LastName is not null)
@@ -127,6 +141,15 @@ public class UserService(IUserRepository repository, IMapper mapper)
                 return GenericResponse<UserDto>.Conflict("Email já cadastrado.");
 
             user.Email = validatedEmail;
+        }
+
+        if (dto.PhoneNumber is not null)
+        {
+            var phoneNumberResult = PhoneNumber.Create(dto.PhoneNumber);
+            if (phoneNumberResult.IsFailure)
+                return GenericResponse<UserDto>.BadRequest(UserResponse.CreationFailed, phoneNumberResult.Errors!);
+
+            user.PhoneNumber = phoneNumberResult.Data!;
         }
 
         _mapper.Map(dto, user);

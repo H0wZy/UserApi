@@ -12,6 +12,20 @@ public sealed partial record Name
     private const int MinLength = 3;
     private const int MaxLength = 50;
 
+    private static readonly HashSet<string> ReservedWords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "administrador",
+        "admin",
+        "root",
+        "superuser",
+        "support",
+        "api",
+        "me",
+        "user",
+        "users",
+        "null",
+    };
+
     public string FirstName { get; } = string.Empty;
     public string LastName { get; } = string.Empty;
     public string FullName => $"{FirstName} {LastName}";
@@ -22,10 +36,10 @@ public sealed partial record Name
         LastName = lastName;
     }
 
-    public static Result<Name> Create(string? firstName, string? lsatName)
+    public static Result<Name> Create(string? firstName, string? lastName)
     {
         var normalizedFirstName = firstName?.Trim() ?? string.Empty;
-        var normalizedLastName = lsatName?.Trim() ?? string.Empty;
+        var normalizedLastName = lastName?.Trim() ?? string.Empty;
 
         var errors = new List<string>();
 
@@ -44,6 +58,9 @@ public sealed partial record Name
             errors.Add($"{field} não pode ser vázio.");
             return;
         }
+
+        if (ReservedWords.Contains(value))
+            errors.Add($"{field} contém palavras proíbidas.");
 
         if (value.Length is < MinLength or > MaxLength)
             errors.Add($"{field} deve conter entre {MinLength} e {MaxLength} caracteres.");

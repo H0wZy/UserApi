@@ -24,15 +24,15 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    protected override void OnModelCreating(ModelBuilder mb)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(mb);
+        base.OnModelCreating(modelBuilder);
 
         var converter = new ValueConverter<UserType, string>(
             v => v.ToDescription(),
             v => ParseUserType(v));
 
-        mb.Entity<User>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.OwnsOne(u => u.Cpf, cpf =>
             {
@@ -76,6 +76,12 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                     .HasColumnName("last_name")
                     .HasMaxLength(50)
                     .IsRequired();
+            });
+            entity.OwnsOne(u => u.PhoneNumber, phoneNumber =>
+            {
+                phoneNumber.Property(p => p.Value)
+                    .HasColumnName("phone_number")
+                    .HasMaxLength(13);
             });
             entity.Property(u => u.UserType)
                 .HasConversion(converter)

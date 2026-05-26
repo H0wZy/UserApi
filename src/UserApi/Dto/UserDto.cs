@@ -5,6 +5,7 @@ public record UserDto(
     string Username,
     string Email,
     string FullName,
+    string? PhoneNumber,
     DateOnly BirthDate,
     string Cpf,
     string UserType,

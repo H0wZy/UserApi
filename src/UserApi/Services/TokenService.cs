@@ -30,8 +30,11 @@ public class TokenService(IConfiguration config) : ITokenService
             new(ClaimTypes.Role, user.UserType.ToDescription()),
             new(ClaimTypes.AuthenticationMethod, loginMethod),
             new(JwtRegisteredClaimNames.AuthTime,
-                new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+                new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
+
+        if (user.PhoneNumber is not null)
+            claims.Add(new Claim(JwtRegisteredClaimNames.PhoneNumber, user.PhoneNumber.Value));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

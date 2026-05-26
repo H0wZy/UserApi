@@ -28,6 +28,7 @@ public class UserProfile : Profile
             .ForMember(dest => dest.Username, opt => opt.Ignore())
             .ForMember(dest => dest.Email, opt => opt.Ignore())
             .ForMember(dest => dest.Name, opt => opt.Ignore())
+            .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
             .ForMember(dest => dest.Cpf, opt => opt.Ignore())
             .ForMember(dest => dest.Password, opt => opt.Ignore())
             .ForMember(dest => dest.BirthDate, opt => opt.Ignore())
@@ -36,24 +37,29 @@ public class UserProfile : Profile
             .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.FirstName, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.LastName, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.PhoneNumber, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.Cpf, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.Password, opt => opt.DoNotValidate());
 
         // UpdateUserDto → User (só atualiza campos não-nulos)
         CreateMap<UpdateUserDto, User>()
             .ForMember(dest => dest.Username, opt => opt.Ignore())
-            .ForSourceMember(src => src.Username, opt => opt.DoNotValidate())
             .ForMember(dest => dest.Email, opt => opt.Ignore())
-            .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
             .ForMember(dest => dest.Name, opt => opt.Ignore())
+            .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
+            .ForSourceMember(src => src.Username, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.Email, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.FirstName, opt => opt.DoNotValidate())
             .ForSourceMember(src => src.LastName, opt => opt.DoNotValidate())
+            .ForSourceMember(src => src.PhoneNumber, opt => opt.DoNotValidate())
             .ForAllMembers(opt => opt.Condition((_, _, srcMember) => srcMember is not null));
 
         // User → UserDto (convenção automática, só mapeia o que difere)
         CreateMap<User, UserDto>()
             .ForCtorParam(nameof(UserDto.Username), opt => opt.MapFrom(src => src.Username.Value))
             .ForCtorParam(nameof(UserDto.Email), opt => opt.MapFrom(src => src.Email.Value))
+            .ForCtorParam(nameof(UserDto.PhoneNumber),
+                opt => opt.MapFrom(src => src.PhoneNumber != null ? src.PhoneNumber.Value : null))
             .ForCtorParam(nameof(UserDto.Cpf), opt => opt.MapFrom(src => src.Cpf.Value))
             .ForCtorParam(nameof(UserDto.UserType), opt => opt.MapFrom(src => src.UserType.ToDescription()));
     }

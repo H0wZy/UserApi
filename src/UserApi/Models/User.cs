@@ -11,8 +11,7 @@ public class User : AccountEntity
     public required Email Email { get; set; }
     public required Name Name { get; set; }
     [NotMapped] public string FullName => Name.FullName;
-    // TODO: Criar VO PhoneNumber
-    // [Column("phone_number")] public PhoneNumber? PhoneNumber { get; set; }
+    public PhoneNumber? PhoneNumber { get; set; }
     [Column("user_type")] public UserType UserType { get; init; }
     public required Cpf Cpf { get; init; }
     // TODO: Criar VO Cnpj
