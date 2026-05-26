@@ -47,6 +47,8 @@ builder.Services.AddDbContext<UserDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
+
 var logger = app.Logger;
 
 // Migrations
@@ -81,6 +83,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();
