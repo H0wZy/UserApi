@@ -10,4 +10,5 @@ public interface IUserRepository : IGenericRepository<User>
     Task<bool> GetEmailExistenceAsync(string email);
     Task<bool> GetUsernameExistenceAsync(string username);
     Task<bool> GetCpfExistenceAsync(string cpf);
+    Task<bool> GetPhoneNumberExistenceAsync(string phoneNumber);
 }

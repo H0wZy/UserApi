@@ -23,4 +23,7 @@ public class UserRepository(UserDbContext ctx) : GenericRepository<User>(ctx), I
 
     public async Task<bool> GetCpfExistenceAsync(string cpf)
         => await Context.Users.AnyAsync(u => u.Cpf.Value == cpf);
+
+    public async Task<bool> GetPhoneNumberExistenceAsync(string phoneNumber) =>
+        await Context.Users.AnyAsync(u => u.PhoneNumber != null && u.PhoneNumber.Value == phoneNumber);
 }

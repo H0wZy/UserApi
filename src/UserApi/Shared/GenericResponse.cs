@@ -4,20 +4,22 @@ namespace UserApi.Shared;
 
 public record GenericResponse<T>
 {
-    public bool Success { get; init; }
+    public bool IsSuccess { get; init; }
     public string Message { get; init; }
     public T? Data { get; init; }
     public IEnumerable<string>? Errors { get; init; }
     public HttpStatusCode StatusCode { get; init; }
 
-    private GenericResponse(bool success, string message, T? data, HttpStatusCode statusCode, IEnumerable<string>? errors = null)
+    private GenericResponse(bool isSuccess, string message, T? data, HttpStatusCode statusCode, IEnumerable<string>? errors = null)
     {
-        Success = success;
+        IsSuccess = isSuccess;
         Message = message;
         Data = data;
         StatusCode = statusCode;
         Errors = errors;
     }
+
+    public bool IsFailure => !IsSuccess;
 
     public static GenericResponse<T> Ok(T data, string message = "Operação realizada com sucesso!") =>
         new(true, message, data, HttpStatusCode.OK);
