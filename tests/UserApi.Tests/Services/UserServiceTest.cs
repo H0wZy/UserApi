@@ -57,11 +57,8 @@ public class UserServiceTest
     public async Task CreateAsync_When_PhoneNumberAlreadyExists_ShouldFail()
     {
         _repositoryMock.Setup(r => r.GetPhoneNumberExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
-        var service = new UserService(_repositoryMock.Object, _mapperMock.Object);
-
         var dto = MakeCreateUserDto(phoneNumber: "43988888888");
-        var result = await service.CreateAsync(dto);
-
+        var result = await _service.CreateAsync(dto);
         Assert.True(result.IsFailure);
     }
 
@@ -107,6 +104,54 @@ public class UserServiceTest
 
     #endregion
 
+    #region UpdateUserPasswordAsync Tests
+
+    [Fact(DisplayName = "UpdatePassword when user dont exists should fail")]
+    public async Task UpdatePassword_When_UserDontExists_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((User?)null);
+        var result = await _service.UpdateUserPasswordAsync(Guid.NewGuid(), MakeUpdatePasswordDto());
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "UpdatePassword with invalid new password should fail")]
+    public async Task UpdatePassword_WithInvalid_NewPassword_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
+        var result =
+            await _service.UpdateUserPasswordAsync(Guid.NewGuid(),
+                MakeUpdatePasswordDto(newPassword: "invalid_password"));
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "UpdatePassword when current password dont match should fail")]
+    public async Task UpdatePassword_WhenCurrentPassword_DontMatch_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
+        var result = await _service.UpdateUserPasswordAsync(Guid.NewGuid(),
+            MakeUpdatePasswordDto(currentPassword: "ThisCurrentFakeStrongPass123DontMatch."));
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "UpdatePassword when new password is the same as current password should fail")]
+    public async Task UpdatePassword_When_CurrentPassword_IsTheSameAs_NewPassword_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
+        var result = await _service.UpdateUserPasswordAsync(Guid.NewGuid(),
+            MakeUpdatePasswordDto(newPassword: "FakeStrongPass123."));
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "UpdatePassword should success")]
+    public async Task UpdatePassword_ShouldSuccess()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
+        var result = await _service.UpdateUserPasswordAsync(Guid.NewGuid(), MakeUpdatePasswordDto());
+        Assert.True(result.IsSuccess);
+    }
+
+    #endregion
+
     private static User MakeUser() => new()
     {
         Username = Username.Create("FakeUsername").Data!,
@@ -120,6 +165,11 @@ public class UserServiceTest
         AcceptedTermsAt = DateTime.UtcNow,
         UserType = UserType.Individual
     };
+
+    private static UpdatePasswordDto MakeUpdatePasswordDto(
+        string currentPassword = "FakeStrongPass123.",
+        string newPassword = "NewFakeStrongPass123.")
+        => new(currentPassword, newPassword);
 
     private static UpdateUserDto MakeUpdateUserDto(
         string? username = null,
