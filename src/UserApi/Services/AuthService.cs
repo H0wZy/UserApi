@@ -34,14 +34,17 @@ public class AuthService(IUserRepository repository, ITokenService service)
 
         if (user is null)
             return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.InvalidCredentials]);
+        
+        if (user.IsOnline)
+            return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.AlreadyLoggedIn]);
 
         if (user.IsDisabled)
-            return GenericResponse<TokenDto>.BadRequest("Usuário desabilitado.");
+            return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.Disabled]);
 
         var passwordIsValid = user.Password.Verify(dto.Password);
 
         if (!passwordIsValid)
-            return GenericResponse<TokenDto>.BadRequest(UserResponse.InvalidCredentials);
+            return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.InvalidCredentials]);
 
         user.LoginMethod = loginMethod;
         user.IsOnline = true;
@@ -54,10 +57,19 @@ public class AuthService(IUserRepository repository, ITokenService service)
         return GenericResponse<TokenDto>.Ok(token, "Login realizado com sucesso.");
     }
 
-    // TODO: Implementar lógica de logout verificando se User.IsOnline == true
-    public Task<GenericResponse<bool>> LogoutAsync(Guid userId)
+    public async Task<GenericResponse<bool>> LogoutAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var user = await repository.GetByIdAsync(id);
+
+        if (user is null)
+            return GenericResponse<bool>.BadRequest(UserResponse.NotFound);
+
+        if (!user.IsOnline)
+            return GenericResponse<bool>.BadRequest(UserResponse.AlreadyLoggedOut);
+
+        user.IsOnline = false;
+        await repository.UpdateAsync(user);
+        return GenericResponse<bool>.Ok(true, "Logout realizado com sucesso.");
     }
 
     private static bool IsEmail(string login) => login.Contains('@', StringComparison.Ordinal);

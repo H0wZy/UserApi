@@ -208,27 +208,4 @@ public class UserService(IUserRepository repository, IMapper mapper)
         await repository.UpdateAsync(user);
         return GenericResponse<bool>.Ok(true, "Senha atualizada com sucesso!");
     }
-
-    public async Task<GenericResponse<bool>> UpdateUserLastLoginAsync(Guid id, string loginMethod)
-    {
-        var user = await repository.GetByIdAsync(id);
-        if (user is null) return GenericResponse<bool>.NotFound();
-
-        user.LoginMethod = loginMethod;
-        user.IsOnline = true;
-        user.LastLoginAt = DateTime.UtcNow;
-
-        await repository.UpdateAsync(user);
-        return GenericResponse<bool>.Ok(true);
-    }
-
-    public async Task<GenericResponse<bool>> UpdateUserLastLogoutAsync(Guid id)
-    {
-        var user = await repository.GetByIdAsync(id);
-        if (user is null) return GenericResponse<bool>.NotFound(UserResponse.NotFound);
-
-        user.LastLogoutAt = DateTime.UtcNow;
-        await repository.UpdateAsync(user);
-        return GenericResponse<bool>.Ok(true);
-    }
 }

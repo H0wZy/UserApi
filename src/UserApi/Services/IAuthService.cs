@@ -6,5 +6,5 @@ namespace UserApi.Services;
 public interface IAuthService
 {
     Task<GenericResponse<TokenDto>> LoginAsync(LoginDto dto);
-    Task<GenericResponse<bool>> LogoutAsync(Guid userId);
+    Task<GenericResponse<bool>> LogoutAsync(Guid id);
 }
