@@ -192,7 +192,7 @@ public class UserService(IUserRepository repository, IMapper mapper)
     public async Task<GenericResponse<bool>> UpdateUserPasswordAsync(Guid id, UpdatePasswordDto dto)
     {
         var user = await repository.GetByIdAsync(id);
-        if (user is null) return GenericResponse<bool>.NotFound();
+        if (user is null) return GenericResponse<bool>.NotFound(UserResponse.NotFound);
 
         var passwordResult = Password.Create(dto.NewPassword);
         if (passwordResult.IsFailure)
