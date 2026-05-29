@@ -27,18 +27,21 @@ public class UserServiceTest
     [Fact(DisplayName = "CreateAsync without accepting terms should fail")]
     public async Task CreateAsync_WithoutAcceptingTerms_ShouldFail()
     {
-        var dto = MakeCreateUserDto(acceptedTerms: false);
-        var result = await _service.CreateAsync(dto);
-
+        var result = await _service.CreateAsync(MakeCreateUserDto(acceptedTerms: false));
         Assert.True(result.IsFailure);
     }
 
     [Fact(DisplayName = "CreateAsync with invalid Cpf should fail")]
     public async Task CreateAsync_InvalidCpf_ShouldFail()
     {
-        var dto = MakeCreateUserDto(cpf: "000.000.000-00");
-        var result = await _service.CreateAsync(dto);
+        var result = await _service.CreateAsync(MakeCreateUserDto(cpf: "000.000.000-00"));
+        Assert.True(result.IsFailure);
+    }
 
+    [Fact(DisplayName = "CreateAsync with invalid password should fail")]
+    public async Task CreateAsync_InvalidPassword_ShouldFail()
+    {
+        var result = await _service.CreateAsync(MakeCreateUserDto(password: "invalid_password"));
         Assert.True(result.IsFailure);
     }
 
@@ -46,10 +49,7 @@ public class UserServiceTest
     public async Task CreateAsync_When_CpfAlreadyExists_ShouldFail()
     {
         _repositoryMock.Setup(r => r.GetCpfExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
-
-        var dto = MakeCreateUserDto();
-        var result = await _service.CreateAsync(dto);
-
+        var result = await _service.CreateAsync(MakeCreateUserDto(cpf: "529.982.247-25"));
         Assert.True(result.IsFailure);
     }
 
@@ -57,9 +57,31 @@ public class UserServiceTest
     public async Task CreateAsync_When_PhoneNumberAlreadyExists_ShouldFail()
     {
         _repositoryMock.Setup(r => r.GetPhoneNumberExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
-        var dto = MakeCreateUserDto(phoneNumber: "43988888888");
-        var result = await _service.CreateAsync(dto);
+        var result = await _service.CreateAsync(MakeCreateUserDto(phoneNumber: "43988888888"));
         Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "CreateAsync when email already exists should fail")]
+    public async Task CreateAsync_When_EmailAlreadyExists_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetEmailExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
+        var result = await _service.CreateAsync(MakeCreateUserDto(email: "this_email_already_exists@email.com"));
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "CreateAsync when username already exists should fail")]
+    public async Task CreateAsync_When_UsernameAlreadyExists_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetUsernameExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
+        var result = await _service.CreateAsync(MakeCreateUserDto(username: "thisAlreadyExists"));
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "CreateAsync should success")]
+    public async Task CreateAsync_ShouldSuccess()
+    {
+        var result = await _service.CreateAsync(MakeCreateUserDto());
+        Assert.True(result.IsSuccess);
     }
 
     #endregion
@@ -79,7 +101,7 @@ public class UserServiceTest
     {
         _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
         _repositoryMock.Setup(r => r.GetUsernameExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
-        var result = await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(username: "AnotherFakeUsername"));
+        var result = await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(username: "changeToAnotherFakeUsername"));
         Assert.True(result.IsFailure);
     }
 
@@ -89,7 +111,7 @@ public class UserServiceTest
         _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
         _repositoryMock.Setup(r => r.GetEmailExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
         var result =
-            await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(email: "another_fake_email@email.com"));
+            await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(email: "change_to_another_fake_email@email.com"));
         Assert.True(result.IsFailure);
     }
 
@@ -180,13 +202,15 @@ public class UserServiceTest
         => new(username, email, firstName, lastName, phoneNumber);
 
     private static CreateUserDto MakeCreateUserDto(
+        string username = "FakeUsername",
+        string email = "fake_email@email.com",
         string cpf = "529.982.247-25",
         string password = "StrongPass123.",
         bool acceptedTerms = true,
         string? phoneNumber = null)
         => new(
-            Username: "testUser",
-            Email: "test@email.com",
+            username,
+            email,
             FirstName: "Mark",
             LastName: "Tester",
             phoneNumber,
