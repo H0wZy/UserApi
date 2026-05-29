@@ -8,7 +8,7 @@ namespace UserApi.ValueObjects;
 public sealed partial record Username
 {
     private const int MinLength = 3;
-    private const int MaxLength = 20;
+    private const int MaxLength = 30;
 
     private static readonly HashSet<string> ReservedWords = new(StringComparer.OrdinalIgnoreCase)
     {
