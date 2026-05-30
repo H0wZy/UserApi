@@ -90,11 +90,28 @@ public class AuthServiceTest
 
     #region LogoutAsync Tests
 
-    // TODO: terminar testes de LogoutAsync
-    [Fact(DisplayName = "LogoutAsync should success")]
-    public async Task LogoutAsync_ShouldSuccess()
+    [Fact(DisplayName = "LogoutAsync when user dont exists should fail")]
+    public async Task LogoutAsync_When_UserDontExists_ShouldFail()
     {
-        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((User?)null);
+        var result = await _service.LogoutAsync(Guid.NewGuid());
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "LogoutAsync when user is offline should fail")]
+    public async Task LogoutAsync_When_UserIsOffline_ShouldFail()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser(isOnline: false));
+        var result = await _service.LogoutAsync(Guid.NewGuid());
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact(DisplayName = "LogoutAsync when user is online should success")]
+    public async Task LogoutAsync_When_UserIsOnline_ShouldSuccess()
+    {
+        _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser(isOnline: true));
+        var result = await _service.LogoutAsync(Guid.NewGuid());
+        Assert.True(result.IsSuccess);
     }
 
     #endregion
