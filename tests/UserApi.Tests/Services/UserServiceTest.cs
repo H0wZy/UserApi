@@ -38,13 +38,6 @@ public class UserServiceTest
         Assert.True(result.IsFailure);
     }
 
-    [Fact(DisplayName = "CreateAsync without select role should fail")]
-    public async Task CreateAsync_WithoutSelectRole_ShouldFail()
-    {
-        var result = await _service.CreateAsync(MakeCreateUserDto(role: 0));
-        Assert.True(result.IsFailure);
-    }
-
     [Fact(DisplayName = "CreateAsync with invalid Cpf should fail")]
     public async Task CreateAsync_InvalidCpf_ShouldFail()
     {
@@ -225,7 +218,6 @@ public class UserServiceTest
         string password = "StrongPass123.",
         bool acceptedTerms = true,
         AccType accType = AccType.Individual,
-        Role role = Role.CommonUser,
         string? phoneNumber = null)
         => new(
             username,
@@ -236,7 +228,6 @@ public class UserServiceTest
             password,
             cpf,
             accType,
-            role,
             BirthDate: new DateOnly(2000, 1, 1),
             acceptedTerms
         );

@@ -12,7 +12,6 @@ public record CreateUserDto(
     string Password,
     string Cpf,
     [EnumDataType(typeof(AccType))] AccType Type,
-    [EnumDataType(typeof(Role))] Role Role,
     [Required] DateOnly BirthDate,
     bool AcceptedTerms
 );
