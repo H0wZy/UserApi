@@ -28,9 +28,13 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
     {
         base.OnModelCreating(modelBuilder);
 
-        var converter = new ValueConverter<UserType, string>(
+        var userTypeConverter = new ValueConverter<UserType, string>(
             v => v.ToDescription(),
             v => ParseUserType(v));
+
+        var roleConverter = new ValueConverter<Role, string>(
+            v => v.ToDescription(),
+            v => ParseRole(v));
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -84,8 +88,15 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                     .HasMaxLength(13);
             });
             entity.Property(u => u.UserType)
-                .HasConversion(converter)
+                .HasConversion(userTypeConverter)
+                .HasColumnName("user_type")
                 .HasMaxLength(2)
+                .IsRequired();
+            
+            entity.Property(u => u.Role)
+                .HasConversion(roleConverter)
+                .HasColumnName("role")
+                .HasMaxLength(30)
                 .IsRequired();
         });
     }
@@ -126,6 +137,19 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         {
             ["PF"] = UserType.Individual,
             ["PJ"] = UserType.Company
+        };
+
+        return map.TryGetValue(value, out var type)
+            ? type
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
+    }
+
+    private static Role ParseRole(string value)
+    {
+        var map = new Dictionary<string, Role>
+        {
+            ["Administrador"] = Role.Admin,
+            ["Usuário comum"] = Role.CommonUser
         };
 
         return map.TryGetValue(value, out var type)

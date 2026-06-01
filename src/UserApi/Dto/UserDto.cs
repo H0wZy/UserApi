@@ -9,6 +9,7 @@ public record UserDto(
     DateOnly BirthDate,
     string Cpf,
     string UserType,
+    string Role,
     bool AcceptedTerms,
     DateTime? AcceptedTermsAt,
     bool IsDisabled,
