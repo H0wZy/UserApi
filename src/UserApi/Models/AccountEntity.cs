@@ -5,6 +5,7 @@ namespace UserApi.Models;
 
 public abstract class AccountEntity : BaseEntity
 {
+    public required AccType Type { get; init; }
     public required Role Role { get; init; }
     [Column("accepted_terms")] public required bool AcceptedTerms { get; init; }
     [Column("accepted_terms_at")] public required DateTime AcceptedTermsAt { get; init; }

@@ -8,7 +8,7 @@ public record UserDto(
     string? PhoneNumber,
     DateOnly BirthDate,
     string Cpf,
-    string UserType,
+    string Type,
     string Role,
     bool AcceptedTerms,
     DateTime? AcceptedTermsAt,

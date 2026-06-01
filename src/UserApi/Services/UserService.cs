@@ -18,6 +18,12 @@ public class UserService(IUserRepository repository, IMapper mapper)
         if (!dto.AcceptedTerms)
             return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
 
+        if (dto.Type <= 0)
+            return GenericResponse<UserDto>.BadRequest("O usuário deve selecionar o tipo da conta para se cadastrar.");
+
+        if (dto.Role <= 0)
+            return GenericResponse<UserDto>.BadRequest("O usuário deve selecionar um cargo para se cadastrar.");
+
         var cpfResult = Cpf.Create(dto.Cpf);
         if (cpfResult.IsFailure) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
 
@@ -78,7 +84,7 @@ public class UserService(IUserRepository repository, IMapper mapper)
             BirthDate = dto.BirthDate,
             AcceptedTerms = true,
             AcceptedTermsAt = DateTime.UtcNow,
-            UserType = dto.UserType,
+            Type = dto.Type,
             Role = dto.Role,
         };
 

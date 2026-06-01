@@ -89,12 +89,12 @@ public class UserController(IUserService service, IAuthService authService) : Co
     public async Task<ActionResult<GenericResponse<TokenDto>>> Login(LoginDto dto) =>
         await ExecuteAsync(() => authService.LoginAsync(dto));
 
-    [HttpGet("types")]
+    [HttpGet("account-types")]
     [AllowAnonymous]
-    public IActionResult GetUserTypes()
+    public IActionResult GetAccTypes()
     {
-        var types = System.Enum.GetValues<UserType>()
-            .Select(t => new UserTypeOptionDto(
+        var types = System.Enum.GetValues<AccType>()
+            .Select(t => new AccTypeOptionDto(
                 Value: (int)t,
                 Label: t.ToDescription()));
         return Ok(types);

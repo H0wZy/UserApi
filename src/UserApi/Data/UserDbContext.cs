@@ -28,9 +28,9 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
     {
         base.OnModelCreating(modelBuilder);
 
-        var userTypeConverter = new ValueConverter<UserType, string>(
+        var accTypeConverter = new ValueConverter<AccType, string>(
             v => v.ToDescription(),
-            v => ParseUserType(v));
+            v => ParseAccType(v));
 
         var roleConverter = new ValueConverter<Role, string>(
             v => v.ToDescription(),
@@ -87,9 +87,9 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                     .HasColumnName("phone_number")
                     .HasMaxLength(13);
             });
-            entity.Property(u => u.UserType)
-                .HasConversion(userTypeConverter)
-                .HasColumnName("user_type")
+            entity.Property(u => u.Type)
+                .HasConversion(accTypeConverter)
+                .HasColumnName("account_type")
                 .HasMaxLength(2)
                 .IsRequired();
             
@@ -131,17 +131,17 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         });
     }
 
-    private static UserType ParseUserType(string value)
+    private static AccType ParseAccType(string value)
     {
-        var map = new Dictionary<string, UserType>
+        var map = new Dictionary<string, AccType>
         {
-            ["PF"] = UserType.Individual,
-            ["PJ"] = UserType.Company
+            ["PF"] = AccType.Individual,
+            ["PJ"] = AccType.Company
         };
 
         return map.TryGetValue(value, out var type)
             ? type
-            : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para AccType.");
     }
 
     private static Role ParseRole(string value)
@@ -154,6 +154,6 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 
         return map.TryGetValue(value, out var type)
             ? type
-            : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para Role.");
     }
 }
