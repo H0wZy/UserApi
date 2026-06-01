@@ -26,15 +26,15 @@ public class AuthService(IUserRepository repository, ITokenService service)
             return GenericResponse<TokenDto>.BadRequest("Dados inválidos.", ["Login e senha são obrigatórios."]);
 
         var login = dto.Login.Trim();
-        var loginMethod = IsEmail(login) ? "email" : "username";
+        var lastLoginMethod = IsEmail(login) ? "email" : "username";
 
-        var user = loginMethod == "email"
+        var user = lastLoginMethod == "email"
             ? await repository.GetByEmailAsync(login)
             : await repository.GetByUsernameAsync(login);
 
         if (user is null)
             return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.InvalidCredentials]);
-        
+
         if (user.IsOnline)
             return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.AlreadyLoggedIn]);
 
@@ -46,13 +46,13 @@ public class AuthService(IUserRepository repository, ITokenService service)
         if (!passwordIsValid)
             return GenericResponse<TokenDto>.BadRequest(UserResponse.AuthFailed, [UserResponse.InvalidCredentials]);
 
-        user.LoginMethod = loginMethod;
-        user.IsOnline = true;
         user.LastLoginAt = DateTime.UtcNow;
+        user.LastLoginMethod = lastLoginMethod;
+        user.IsOnline = true;
 
         await repository.UpdateAsync(user);
 
-        var token = service.GenerateToken(user, loginMethod);
+        var token = service.GenerateToken(user, lastLoginMethod);
 
         return GenericResponse<TokenDto>.Ok(token, "Login realizado com sucesso.");
     }
@@ -62,12 +62,14 @@ public class AuthService(IUserRepository repository, ITokenService service)
         var user = await repository.GetByIdAsync(id);
 
         if (user is null)
-            return GenericResponse<bool>.BadRequest(UserResponse.NotFound);
+            return GenericResponse<bool>.NotFound(UserResponse.NotFound);
 
         if (!user.IsOnline)
             return GenericResponse<bool>.BadRequest(UserResponse.AlreadyLoggedOut);
 
         user.IsOnline = false;
+        user.LastLogoutAt = DateTime.UtcNow;
+
         await repository.UpdateAsync(user);
         return GenericResponse<bool>.Ok(true, "Logout realizado com sucesso.");
     }

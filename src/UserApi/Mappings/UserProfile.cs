@@ -20,7 +20,7 @@ public class UserProfile : Profile
     public UserProfile()
     {
         // TODO FIXME: Preciso mapear LoginDto e TokenDto?
-        // TODO FIXME: Preciso mapear campos IsOnline e LoginMethod da AccountEntity?
+        // TODO FIXME: Preciso mapear campos IsOnline e LastLoginMethod da AccountEntity?
 
         // CreateUserDto → User
         CreateMap<CreateUserDto, User>()

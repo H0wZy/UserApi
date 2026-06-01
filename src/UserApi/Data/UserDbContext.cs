@@ -117,6 +117,8 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
     [
         nameof(AccountEntity.LastLoginAt),
         nameof(AccountEntity.LastLogoutAt),
+        nameof(AccountEntity.IsOnline),
+        nameof(AccountEntity.LastLoginMethod),
         nameof(BaseEntity.UpdatedAt)
     ];
 

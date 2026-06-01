@@ -4,6 +4,7 @@ using UserApi.Services;
 using UserApi.Enum;
 using UserApi.Shared;
 using Microsoft.AspNetCore.Authorization;
+using UserApi.Utils;
 
 namespace UserApi.Controllers;
 
@@ -88,8 +89,9 @@ public class UserController(IUserService userService, IAuthService authService) 
     public async Task<ActionResult<GenericResponse<TokenDto>>> Login(LoginDto dto) =>
         await ExecuteAsync(() => authService.LoginAsync(dto));
 
-    HttpPost("{id:guid}/logout")]
+    [HttpPost("{id:guid}/logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GenericResponse<bool>>> Logout(Guid id) =>
         await ExecuteAsync(() => authService.LogoutAsync(id));
