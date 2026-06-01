@@ -31,6 +31,13 @@ public class UserServiceTest
         Assert.True(result.IsFailure);
     }
 
+    [Fact(DisplayName = "CreateAsync without select account type should fail")]
+    public async Task CreateAsync_WithoutSelectAccountType_ShouldFail()
+    {
+        var result = await _service.CreateAsync(MakeCreateUserDto(accType: 0));
+        Assert.True(result.IsFailure);
+    }
+
     [Fact(DisplayName = "CreateAsync with invalid Cpf should fail")]
     public async Task CreateAsync_InvalidCpf_ShouldFail()
     {
@@ -101,7 +108,8 @@ public class UserServiceTest
     {
         _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
         _repositoryMock.Setup(r => r.GetUsernameExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
-        var result = await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(username: "changeToAnotherFakeUsername"));
+        var result =
+            await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(username: "changeToAnotherFakeUsername"));
         Assert.True(result.IsFailure);
     }
 
@@ -111,7 +119,8 @@ public class UserServiceTest
         _repositoryMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(MakeUser());
         _repositoryMock.Setup(r => r.GetEmailExistenceAsync(It.IsAny<string>())).ReturnsAsync(true);
         var result =
-            await _service.UpdateByIdAsync(Guid.NewGuid(), MakeUpdateUserDto(email: "change_to_another_fake_email@email.com"));
+            await _service.UpdateByIdAsync(Guid.NewGuid(),
+                MakeUpdateUserDto(email: "change_to_another_fake_email@email.com"));
         Assert.True(result.IsFailure);
     }
 
@@ -185,7 +194,8 @@ public class UserServiceTest
         BirthDate = new DateOnly(2000, 1, 1),
         AcceptedTerms = true,
         AcceptedTermsAt = DateTime.UtcNow,
-        UserType = UserType.Individual
+        Type = AccType.Individual,
+        Role = Role.CommonUser
     };
 
     private static UpdatePasswordDto MakeUpdatePasswordDto(
@@ -207,6 +217,7 @@ public class UserServiceTest
         string cpf = "529.982.247-25",
         string password = "StrongPass123.",
         bool acceptedTerms = true,
+        AccType accType = AccType.Individual,
         string? phoneNumber = null)
         => new(
             username,
@@ -216,8 +227,8 @@ public class UserServiceTest
             phoneNumber,
             password,
             cpf,
+            accType,
             BirthDate: new DateOnly(2000, 1, 1),
-            acceptedTerms,
-            UserType: UserType.Individual
+            acceptedTerms
         );
 }

@@ -27,7 +27,7 @@ public class TokenService(IConfiguration config) : ITokenService
             new(JwtRegisteredClaimNames.Name, user.FullName),
             new(ClaimTypes.SerialNumber, user.Cpf.Value),
             new(ClaimTypes.DateOfBirth, user.BirthDate.ToString("yyyy-MM-dd")),
-            new(ClaimTypes.Role, user.UserType.ToDescription()),
+            new(ClaimTypes.Role, user.Type.ToDescription()),
             new(ClaimTypes.AuthenticationMethod, loginMethod),
             new(JwtRegisteredClaimNames.AuthTime,
                 new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)

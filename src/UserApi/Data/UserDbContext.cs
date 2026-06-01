@@ -28,9 +28,13 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
     {
         base.OnModelCreating(modelBuilder);
 
-        var converter = new ValueConverter<UserType, string>(
+        var accTypeConverter = new ValueConverter<AccType, string>(
             v => v.ToDescription(),
-            v => ParseUserType(v));
+            v => ParseAccType(v));
+
+        var roleConverter = new ValueConverter<Role, string>(
+            v => v.ToDescription(),
+            v => ParseRole(v));
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -83,9 +87,16 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                     .HasColumnName("phone_number")
                     .HasMaxLength(13);
             });
-            entity.Property(u => u.UserType)
-                .HasConversion(converter)
+            entity.Property(u => u.Type)
+                .HasConversion(accTypeConverter)
+                .HasColumnName("account_type")
                 .HasMaxLength(2)
+                .IsRequired();
+            
+            entity.Property(u => u.Role)
+                .HasConversion(roleConverter)
+                .HasColumnName("role")
+                .HasMaxLength(30)
                 .IsRequired();
         });
     }
@@ -120,16 +131,29 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         });
     }
 
-    private static UserType ParseUserType(string value)
+    private static AccType ParseAccType(string value)
     {
-        var map = new Dictionary<string, UserType>
+        var map = new Dictionary<string, AccType>
         {
-            ["PF"] = UserType.Individual,
-            ["PJ"] = UserType.Company
+            ["PF"] = AccType.Individual,
+            ["PJ"] = AccType.Company
         };
 
         return map.TryGetValue(value, out var type)
             ? type
-            : throw new InvalidOperationException($"Valor '{value}' não é válido para UserType.");
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para AccType.");
+    }
+
+    private static Role ParseRole(string value)
+    {
+        var map = new Dictionary<string, Role>
+        {
+            ["Administrador"] = Role.Admin,
+            ["Usuário comum"] = Role.CommonUser
+        };
+
+        return map.TryGetValue(value, out var type)
+            ? type
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para Role.");
     }
 }

@@ -61,6 +61,7 @@ public class UserProfile : Profile
             .ForCtorParam(nameof(UserDto.PhoneNumber),
                 opt => opt.MapFrom(src => src.PhoneNumber != null ? src.PhoneNumber.Value : null))
             .ForCtorParam(nameof(UserDto.Cpf), opt => opt.MapFrom(src => src.Cpf.Value))
-            .ForCtorParam(nameof(UserDto.UserType), opt => opt.MapFrom(src => src.UserType.ToDescription()));
+            .ForCtorParam(nameof(UserDto.Type), opt => opt.MapFrom(src => src.Type.ToDescription()))
+            .ForCtorParam(nameof(UserDto.Role), opt => opt.MapFrom(src => src.Role.ToDescription()));
     }
 }

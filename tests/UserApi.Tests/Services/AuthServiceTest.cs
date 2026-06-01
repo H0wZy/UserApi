@@ -130,7 +130,8 @@ public class AuthServiceTest
         BirthDate = new DateOnly(2000, 1, 1),
         AcceptedTerms = true,
         AcceptedTermsAt = DateTime.UtcNow,
-        UserType = UserType.Individual,
+        Type = AccType.Individual,
+        Role = Role.CommonUser,
         IsDisabled = isDisabled,
         IsOnline = isOnline
     };

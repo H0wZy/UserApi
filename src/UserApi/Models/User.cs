@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using UserApi.Enum;
 using UserApi.ValueObjects;
 
 namespace UserApi.Models;
@@ -12,7 +11,6 @@ public class User : AccountEntity
     public required Name Name { get; set; }
     [NotMapped] public string FullName => Name.FullName;
     public PhoneNumber? PhoneNumber { get; set; }
-    [Column("user_type")] public UserType UserType { get; init; }
     public required Cpf Cpf { get; init; }
     // TODO: Criar VO Cnpj
     // [Column("cnpj")] public Cnpj? Cnpj { get; init; }

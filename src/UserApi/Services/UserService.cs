@@ -1,6 +1,7 @@
 using AutoMapper;
 using UserApi.Constants;
 using UserApi.Dto;
+using UserApi.Enum;
 using UserApi.Models;
 using UserApi.Repositories;
 using UserApi.Shared;
@@ -17,6 +18,9 @@ public class UserService(IUserRepository repository, IMapper mapper)
     {
         if (!dto.AcceptedTerms)
             return GenericResponse<UserDto>.BadRequest("O usuário deve aceitar os termos para se cadastrar.");
+
+        if (dto.Type is <= 0 or >= (AccType)3)
+            return GenericResponse<UserDto>.BadRequest("O usuário deve selecionar o tipo da conta para se cadastrar.");
 
         var cpfResult = Cpf.Create(dto.Cpf);
         if (cpfResult.IsFailure) return GenericResponse<UserDto>.BadRequest(cpfResult.Error!);
@@ -78,6 +82,8 @@ public class UserService(IUserRepository repository, IMapper mapper)
             BirthDate = dto.BirthDate,
             AcceptedTerms = true,
             AcceptedTermsAt = DateTime.UtcNow,
+            Type = dto.Type,
+            Role = Role.CommonUser,
         };
 
         // Os demais são mapeados depois para aproveitar as validações do AutoMapper
