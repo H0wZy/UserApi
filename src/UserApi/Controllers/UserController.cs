@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using UserApi.Dto;
 using UserApi.Services;
 using UserApi.Enum;
@@ -24,6 +25,17 @@ public class UserController(IUserService userService, IAuthService authService) 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GenericResponse<UserDto>>> GetUserById(Guid id) =>
         await ExecuteAsync(() => userService.GetByIdAsync(id));
+
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet("me")]
+    public async Task<ActionResult<GenericResponse<UserDto>>> GetMe()
+    {
+        var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(id, out var guid)) return Unauthorized();
+        return await ExecuteAsync(() => userService.GetByIdAsync(guid));
+    }
 
     [HttpGet("email/{email}")]
     [ProducesResponseType(StatusCodes.Status200OK)]

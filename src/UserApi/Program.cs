@@ -75,7 +75,9 @@ if (app.Environment.IsDevelopment())
     {
         opt.Title = "User API";
         opt.Theme = ScalarTheme.Default;
-        opt.DefaultHttpClient = new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        opt.DefaultHttpClient =
+            new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        opt.AddPreferredSecuritySchemes("Bearer").AddHttpAuthentication("Bearer", _ => { });
     });
 }
 
