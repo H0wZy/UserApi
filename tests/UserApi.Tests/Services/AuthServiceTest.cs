@@ -60,6 +60,18 @@ public class AuthServiceTest
         Assert.True(result.IsFailure);
     }
 
+    [Theory(DisplayName = "LoginAsync when user is already online should fail")]
+    [InlineData("DisabledUser")]
+    [InlineData("disabledUser@email.com")]
+    public async Task LoginAsync_When_UserIsAlreadyOnline_ShouldFail(string login)
+    {
+        var user = MakeUser(isOnline: true);
+        _repositoryMock.Setup(r => r.GetByUsernameAsync(It.IsAny<string>())).ReturnsAsync(user);
+        _repositoryMock.Setup(r => r.GetByEmailAsync(It.IsAny<string>())).ReturnsAsync(user);
+        var result = await _service.LoginAsync(MakeLoginDto(login: login, password: "AnyPassword123."));
+        Assert.True(result.IsFailure);
+    }
+
     [Theory(DisplayName = "LoginAsync when password is wrong should fail")]
     [InlineData("randomUser")]
     [InlineData("randomUser@email.com")]
