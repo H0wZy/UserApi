@@ -10,7 +10,7 @@ namespace UserApi.Services;
 
 public class TokenService(IConfiguration config) : ITokenService
 {
-    public TokenDto GenerateToken(User user, string loginMethod)
+    public TokenDto GenerateToken(User user, string lastLoginMethod)
     {
         var secret = config["Jwt:Secret"] ?? throw new InvalidOperationException("Jwt:Secret is not set.");
         var issuer = config["Jwt:Issuer"];
@@ -28,7 +28,7 @@ public class TokenService(IConfiguration config) : ITokenService
             new(ClaimTypes.SerialNumber, user.Cpf.Value),
             new(ClaimTypes.DateOfBirth, user.BirthDate.ToString("yyyy-MM-dd")),
             new(ClaimTypes.Role, user.Type.ToDescription()),
-            new(ClaimTypes.AuthenticationMethod, loginMethod),
+            new(ClaimTypes.AuthenticationMethod, lastLoginMethod),
             new(JwtRegisteredClaimNames.AuthTime,
                 new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
@@ -44,6 +44,6 @@ public class TokenService(IConfiguration config) : ITokenService
 
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-        return new TokenDto(AccessToken: accessToken, ExpiresAt: expiresAt, LoginMethod: loginMethod);
+        return new TokenDto(AccessToken: accessToken, ExpiresAt: expiresAt, LastLoginMethod: lastLoginMethod);
     }
 }

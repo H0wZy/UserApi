@@ -15,7 +15,7 @@ public record UserDto(
     bool IsDisabled,
     DateTime? DisabledAt,
     bool IsOnline,
-    string? LoginMethod,
+    string? LastLoginMethod,
     DateTime? LastLoginAt,
     DateTime? LastLogoutAt,
     DateTime CreatedAt,

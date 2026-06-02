@@ -5,5 +5,5 @@ namespace UserApi.Services;
 
 public interface ITokenService
 {
-    TokenDto GenerateToken(User user, string loginMethod);
+    TokenDto GenerateToken(User user, string lastLoginMethod);
 }
