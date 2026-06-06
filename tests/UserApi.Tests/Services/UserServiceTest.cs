@@ -195,7 +195,7 @@ public class UserServiceTest
         AcceptedTerms = true,
         AcceptedTermsAt = DateTime.UtcNow,
         Type = AccType.Individual,
-        Role = Role.CommonUser
+        Role = Role.User
     };
 
     private static UpdatePasswordDto MakeUpdatePasswordDto(

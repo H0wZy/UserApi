@@ -16,6 +16,8 @@ public class UserController(IUserService userService, IAuthService authService) 
 {
     [HttpGet("get-all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<GenericResponse<IEnumerable<UserDto>>>> GetAllUsers() =>
         await ExecuteAsync(userService.GetAllAsync);
@@ -101,12 +103,16 @@ public class UserController(IUserService userService, IAuthService authService) 
     public async Task<ActionResult<GenericResponse<TokenDto>>> Login(LoginDto dto) =>
         await ExecuteAsync(() => authService.LoginAsync(dto));
 
-    [HttpPost("{id:guid}/logout")]
+    [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<GenericResponse<bool>>> Logout(Guid id) =>
-        await ExecuteAsync(() => authService.LogoutAsync(id));
+    public async Task<ActionResult<GenericResponse<bool>>> Logout()
+    {
+        var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(id, out var guid)) return Unauthorized();
+        return await ExecuteAsync(() => authService.LogoutAsync(guid));
+    }
 
     [HttpGet("account-types")]
     [AllowAnonymous]

@@ -8,10 +8,14 @@ using UserApi.Services;
 using UserApi.Data;
 using UserApi.Mappings;
 using UserApi.Middleware;
+using UserApi.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi("v1", opt =>
+{
+    opt.AddDocumentTransformer<BearerSecuritySchemaTransformer>();
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 

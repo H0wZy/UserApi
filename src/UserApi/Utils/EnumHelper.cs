@@ -10,4 +10,11 @@ public static class EnumHelper
         var attribute = field?.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
         return attribute?.Description ?? value.ToString();
     }
+
+    public static T ParseEnum<T>(string value, Dictionary<string, T> map)
+    {
+        return map.TryGetValue(value, out var type)
+            ? type
+            : throw new InvalidOperationException($"Valor '{value}' não é válido para '{typeof(T).Name}'.");
+    }
 }

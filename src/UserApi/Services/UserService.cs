@@ -83,7 +83,7 @@ public class UserService(IUserRepository repository, IMapper mapper)
             AcceptedTerms = true,
             AcceptedTermsAt = DateTime.UtcNow,
             Type = dto.Type,
-            Role = Role.CommonUser,
+            Role = Role.User,
         };
 
         // Os demais são mapeados depois para aproveitar as validações do AutoMapper

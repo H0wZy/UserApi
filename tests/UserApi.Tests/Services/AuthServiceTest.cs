@@ -143,7 +143,7 @@ public class AuthServiceTest
         AcceptedTerms = true,
         AcceptedTermsAt = DateTime.UtcNow,
         Type = AccType.Individual,
-        Role = Role.CommonUser,
+        Role = Role.User,
         IsDisabled = isDisabled,
         IsOnline = isOnline
     };

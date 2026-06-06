@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using UserApi.Dto;
 using UserApi.Models;
-using UserApi.Utils;
 
 namespace UserApi.Services;
 
@@ -21,13 +20,12 @@ public class TokenService(IConfiguration config) : ITokenService
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(JwtRegisteredClaimNames.UniqueName, user.Username.Value),
             new(JwtRegisteredClaimNames.Email, user.Email.Value),
             new(JwtRegisteredClaimNames.Name, user.FullName),
             new(ClaimTypes.SerialNumber, user.Cpf.Value),
             new(ClaimTypes.DateOfBirth, user.BirthDate.ToString("yyyy-MM-dd")),
-            new(ClaimTypes.Role, user.Type.ToDescription()),
+            new(ClaimTypes.Role, user.Role.ToString()),
             new(ClaimTypes.AuthenticationMethod, lastLoginMethod),
             new(JwtRegisteredClaimNames.AuthTime,
                 new DateTimeOffset(user.LastLoginAt!.Value).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)

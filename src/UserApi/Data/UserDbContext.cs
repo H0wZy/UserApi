@@ -30,11 +30,11 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
 
         var accTypeConverter = new ValueConverter<AccType, string>(
             v => v.ToDescription(),
-            v => ParseAccType(v));
+            v => EnumHelper.ParseEnum(v, AccTypeMap));
 
         var roleConverter = new ValueConverter<Role, string>(
             v => v.ToDescription(),
-            v => ParseRole(v));
+            v => EnumHelper.ParseEnum(v, RoleMap));
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -92,7 +92,7 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
                 .HasColumnName("account_type")
                 .HasMaxLength(2)
                 .IsRequired();
-            
+
             entity.Property(u => u.Role)
                 .HasConversion(roleConverter)
                 .HasColumnName("role")
@@ -133,29 +133,15 @@ public class UserDbContext(DbContextOptions<UserDbContext> opt) : DbContext(opt)
         });
     }
 
-    private static AccType ParseAccType(string value)
+    private static readonly Dictionary<string, Role> RoleMap = new()
     {
-        var map = new Dictionary<string, AccType>
-        {
-            ["PF"] = AccType.Individual,
-            ["PJ"] = AccType.Company
-        };
+        ["Admin"] = Role.Admin,
+        ["User"] = Role.User
+    };
 
-        return map.TryGetValue(value, out var type)
-            ? type
-            : throw new InvalidOperationException($"Valor '{value}' não é válido para AccType.");
-    }
-
-    private static Role ParseRole(string value)
+    private static readonly Dictionary<string, AccType> AccTypeMap = new()
     {
-        var map = new Dictionary<string, Role>
-        {
-            ["Administrador"] = Role.Admin,
-            ["Usuário comum"] = Role.CommonUser
-        };
-
-        return map.TryGetValue(value, out var type)
-            ? type
-            : throw new InvalidOperationException($"Valor '{value}' não é válido para Role.");
-    }
+        ["PF"] = AccType.Individual,
+        ["PJ"] = AccType.Company
+    };
 }
