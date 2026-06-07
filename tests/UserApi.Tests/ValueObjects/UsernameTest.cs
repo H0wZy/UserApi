@@ -21,7 +21,7 @@ public class UsernameTest
     [InlineData("")]
     [InlineData(" ")]
     [InlineData("ab")]
-    [InlineData("usernameWith21charsXX")]
+    [InlineData("usernameWithMoreThan30charsShouldFail")]
     [InlineData("randomUser_!#@552")]
     [InlineData("admin")]
     [InlineData("root")]
