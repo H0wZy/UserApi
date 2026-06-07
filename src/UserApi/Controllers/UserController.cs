@@ -34,8 +34,7 @@ public class UserController(IUserService userService, IAuthService authService) 
     [HttpGet("me")]
     public async Task<ActionResult<GenericResponse<UserDto>>> GetMe()
     {
-        var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(id, out var guid)) return Unauthorized();
+        if (!TryGetIdFromClaim(out var guid)) return Unauthorized();
         return await ExecuteAsync(() => userService.GetByIdAsync(guid));
     }
 
@@ -109,8 +108,7 @@ public class UserController(IUserService userService, IAuthService authService) 
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GenericResponse<bool>>> Logout()
     {
-        var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(id, out var guid)) return Unauthorized();
+        if (!TryGetIdFromClaim(out var guid)) return Unauthorized();
         return await ExecuteAsync(() => authService.LogoutAsync(guid));
     }
 
@@ -129,5 +127,11 @@ public class UserController(IUserService userService, IAuthService authService) 
     {
         var response = await action();
         return StatusCode((int)response.StatusCode, response);
+    }
+
+    private bool TryGetIdFromClaim(out Guid id)
+    {
+        var claimId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        return Guid.TryParse(claimId, out id);
     }
 }
